@@ -1,0 +1,1069 @@
+{
+  "pypi:scikit-learn": {
+    "origin": "pypi:scikit-learn",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.19,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.42,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:scikit-learn": 1.0,
+      "pypi:scikit-image": 0.105,
+      "pallets/flask": 0.089
+    },
+    "exposure_score": 4.79
+  },
+  "npm:ajv": {
+    "origin": "npm:ajv",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.06,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.24,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "npm:ajv": 1.0,
+      "npm:eslint": 0.021,
+      "npm:@eslint/eslintrc": 0.015,
+      "pallets/flask": 0.025
+    },
+    "exposure_score": 1.34
+  },
+  "npm:axios": {
+    "origin": "npm:axios",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.09,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.28,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "npm:axios": 1.0,
+      "pallets/flask": 0.089
+    },
+    "exposure_score": 4.79
+  },
+  "npm:flatted": {
+    "origin": "npm:flatted",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.28,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.49,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "npm:flatted": 1.0,
+      "pallets/flask": 0.135,
+      "npm:flat-cache": 0.142
+    },
+    "exposure_score": 7.65
+  },
+  "npm:js-yaml": {
+    "origin": "npm:js-yaml",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.16,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.38,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "npm:js-yaml": 1.0,
+      "pallets/flask": 0.069,
+      "npm:@eslint/eslintrc": 0.086
+    },
+    "exposure_score": 4.79
+  },
+  "npm:minimatch": {
+    "origin": "npm:minimatch",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.34,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.55,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "npm:minimatch": 1.0,
+      "npm:eslint": 0.082,
+      "npm:@eslint/config-array": 0.095,
+      "pallets/flask": 0.08,
+      "npm:@eslint/eslintrc": 0.087
+    },
+    "exposure_score": 4.8
+  },
+  "npm:rollup": {
+    "origin": "npm:rollup",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.17,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.4,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "npm:rollup": 1.0,
+      "pallets/flask": 0.074,
+      "npm:vite": 0.091
+    },
+    "exposure_score": 5.09
+  },
+  "npm:tar": {
+    "origin": "npm:tar",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.17,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.39,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "npm:tar": 1.0,
+      "pallets/flask": 0.089,
+      "npm:@tailwindcss/oxide": 0.081
+    },
+    "exposure_score": 4.79
+  },
+  "npm:vite": {
+    "origin": "npm:vite",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.05,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.21,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 1,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "npm:vite": 1.0,
+      "pallets/flask": 0.047
+    },
+    "exposure_score": 2.65
+  },
+  "pypi:black": {
+    "origin": "pypi:black",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.34,
+    "max_blast_radius": 4,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.58,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:scikit-learn": 0.071,
+      "pypi:black": 1.0,
+      "pypi:hypothesis": 0.073,
+      "pypi:linkify-it-py": 0.094,
+      "pypi:jupytext": 0.09,
+      "pypi:scikit-image": 0.007,
+      "pallets/flask": 0.006
+    },
+    "exposure_score": 4.8
+  },
+  "pypi:mpmath": {
+    "origin": "pypi:mpmath",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.17,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.4,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:mpmath": 1.0,
+      "pypi:scipy": 0.085,
+      "pypi:gmpy2": 0.084
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:fonttools": {
+    "origin": "pypi:fonttools",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.08,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.27,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:fonttools": 1.0,
+      "pypi:matplotlib": 0.079
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:setuptools": {
+    "origin": "pypi:setuptools",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.74,
+    "max_blast_radius": 5,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.81,
+    "p50_blast_radius": 2,
+    "p95_blast_radius": 3,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:setuptools": 1.0,
+      "pypi:asv": 0.155,
+      "pypi:pytest": 0.14,
+      "pypi:mypy": 0.165,
+      "pypi:gmpy2": 0.139,
+      "pypi:matplotlib": 0.142
+    },
+    "exposure_score": 7.71
+  },
+  "pypi:pyarrow": {
+    "origin": "pypi:pyarrow",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.57,
+    "max_blast_radius": 5,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.71,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 3,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:pyarrow": 1.0,
+      "pypi:pandas": 0.14,
+      "pypi:myst-nb": 0.13,
+      "pypi:plotly": 0.148,
+      "pypi:pillow": 0.15
+    },
+    "exposure_score": 7.7
+  },
+  "pypi:numexpr": {
+    "origin": "pypi:numexpr",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.08,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.28,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:numexpr": 1.0,
+      "pypi:pandas": 0.083
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:openpyxl": {
+    "origin": "pypi:openpyxl",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.08,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.27,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:openpyxl": 1.0,
+      "pypi:pandas": 0.081
+    },
+    "exposure_score": 5.09
+  },
+  "pypi:sqlalchemy": {
+    "origin": "pypi:sqlalchemy",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.14,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.34,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:sqlalchemy": 1.0,
+      "pypi:pandas": 0.135
+    },
+    "exposure_score": 7.64
+  },
+  "pypi:pymysql": {
+    "origin": "pypi:pymysql",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.08,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.27,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:pymysql": 1.0,
+      "pypi:pandas": 0.078
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:html5lib": {
+    "origin": "pypi:html5lib",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.09,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.29,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:html5lib": 1.0,
+      "pypi:pandas": 0.092
+    },
+    "exposure_score": 4.64
+  },
+  "pypi:lxml": {
+    "origin": "pypi:lxml",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.25,
+    "max_blast_radius": 4,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.47,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:lxml": 1.0,
+      "pypi:mypy": 0.086,
+      "pypi:sphinx-gallery": 0.093,
+      "pypi:pandas": 0.07
+    },
+    "exposure_score": 4.8
+  },
+  "pypi:jinja2": {
+    "origin": "pypi:jinja2",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.35,
+    "max_blast_radius": 4,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.58,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:sphinx-prompt": 0.08,
+      "pypi:jinja2": 1.0,
+      "pypi:sphinx": 0.1,
+      "pypi:pandas": 0.093,
+      "pypi:pydata-sphinx-theme": 0.082
+    },
+    "exposure_score": 4.8
+  },
+  "pypi:psutil": {
+    "origin": "pypi:psutil",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.23,
+    "max_blast_radius": 4,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.47,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:psutil": 1.0,
+      "pypi:mypy": 0.075,
+      "pypi:memory-profiler": 0.075,
+      "pypi:pytest-xdist": 0.084
+    },
+    "exposure_score": 4.8
+  },
+  "pypi:ipython": {
+    "origin": "pypi:ipython",
+    "n_simulations": 1000,
+    "mean_blast_radius": 2.75,
+    "max_blast_radius": 8,
+    "min_blast_radius": 1,
+    "std_blast_radius": 1.24,
+    "p50_blast_radius": 3,
+    "p95_blast_radius": 5,
+    "critical_hit_rate": 1.0,
+    "node_infection_prob": {
+      "pypi:scikit-image": 0.289,
+      "pypi:ipython": 1.0,
+      "pypi:mpmath": 0.255,
+      "pypi:scipy": 0.012,
+      "pypi:sphinx-copybutton": 0.259,
+      "pypi:jupytext": 0.017,
+      "pypi:black": 0.287,
+      "pypi:hypothesis": 0.028,
+      "pypi:sphinx-gallery": 0.274,
+      "pypi:myst-nb": 0.262,
+      "pallets/flask": 0.004,
+      "pypi:scikit-learn": 0.023,
+      "pypi:linkify-it-py": 0.025,
+      "pypi:gmpy2": 0.018
+    },
+    "exposure_score": 40.35
+  },
+  "pypi:astropy": {
+    "origin": "pypi:astropy",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.09,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.29,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:astropy": 1.0,
+      "pypi:scikit-image": 0.09
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:nbconvert": {
+    "origin": "pypi:nbconvert",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.16,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.39,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:nbconvert": 1.0,
+      "pypi:jupytext": 0.088,
+      "pypi:seaborn": 0.071
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:pyyaml": {
+    "origin": "pypi:pyyaml",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.69,
+    "max_blast_radius": 5,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.76,
+    "p50_blast_radius": 2,
+    "p95_blast_radius": 3,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:pyyaml": 1.0,
+      "pypi:asv": 0.125,
+      "pypi:myst-nb": 0.151,
+      "pypi:pydata-sphinx-theme": 0.142,
+      "pypi:jupytext": 0.151,
+      "pypi:seaborn": 0.124
+    },
+    "exposure_score": 7.71
+  },
+  "pypi:pygments": {
+    "origin": "pypi:pygments",
+    "n_simulations": 1000,
+    "mean_blast_radius": 2.13,
+    "max_blast_radius": 5,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.92,
+    "p50_blast_radius": 2,
+    "p95_blast_radius": 4,
+    "critical_hit_rate": 1.0,
+    "node_infection_prob": {
+      "pypi:sphinx": 0.305,
+      "pypi:pygments": 1.0,
+      "pypi:sphinx-prompt": 0.266,
+      "pypi:pydata-sphinx-theme": 0.291,
+      "pypi:pytest": 0.27
+    },
+    "exposure_score": 40.27
+  },
+  "pypi:docutils": {
+    "origin": "pypi:docutils",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.37,
+    "max_blast_radius": 4,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.58,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:docutils": 1.0,
+      "pypi:jupyterlite-sphinx": 0.085,
+      "pypi:sphinx": 0.113,
+      "pypi:pydata-sphinx-theme": 0.093,
+      "pypi:sphinx-prompt": 0.082
+    },
+    "exposure_score": 5.1
+  },
+  "pypi:babel": {
+    "origin": "pypi:babel",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.25,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.47,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:babel": 1.0,
+      "pypi:pydata-sphinx-theme": 0.129,
+      "pypi:sphinx": 0.121
+    },
+    "exposure_score": 7.65
+  },
+  "pypi:requests": {
+    "origin": "pypi:requests",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.51,
+    "max_blast_radius": 4,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.68,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 3,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:requests": 1.0,
+      "pypi:plotly": 0.079,
+      "pypi:sphinx": 0.078,
+      "pypi:pooch": 0.094,
+      "pypi:sphinx-prompt": 0.081,
+      "pypi:intersphinx_registry": 0.091,
+      "pypi:pytest": 0.089
+    },
+    "exposure_score": 4.85
+  },
+  "pypi:markdown2": {
+    "origin": "pypi:markdown2",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.07,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.25,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:markdown2": 1.0,
+      "pypi:pillow": 0.068
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:tqdm": {
+    "origin": "pypi:tqdm",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.16,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.38,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:tqdm": 1.0,
+      "pypi:meson": 0.075,
+      "pypi:pooch": 0.084
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:paramiko": {
+    "origin": "pypi:paramiko",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.15,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.35,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:paramiko": 1.0,
+      "pypi:pooch": 0.145
+    },
+    "exposure_score": 7.64
+  },
+  "pypi:certifi": {
+    "origin": "pypi:certifi",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.07,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.26,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:certifi": 1.0,
+      "pypi:sphinx-prompt": 0.07
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:idna": {
+    "origin": "pypi:idna",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.08,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.28,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:idna": 1.0,
+      "pypi:sphinx-prompt": 0.085
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:urllib3": {
+    "origin": "pypi:urllib3",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.15,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.36,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:urllib3": 1.0,
+      "pypi:sphinx-prompt": 0.153
+    },
+    "exposure_score": 7.64
+  },
+  "pypi:fiona": {
+    "origin": "pypi:fiona",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.14,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.34,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:fiona": 1.0,
+      "pypi:plotly": 0.138
+    },
+    "exposure_score": 7.64
+  },
+  "pypi:geopandas": {
+    "origin": "pypi:geopandas",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.09,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.29,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:geopandas": 1.0,
+      "pypi:plotly": 0.091
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:orjson": {
+    "origin": "pypi:orjson",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.17,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.39,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:mypy": 0.088,
+      "pypi:orjson": 1.0,
+      "pypi:plotly": 0.08
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:virtualenv": {
+    "origin": "pypi:virtualenv",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.16,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.39,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:virtualenv": 1.0,
+      "pypi:asv": 0.082,
+      "pypi:pytest-cov": 0.079
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:aiohttp": {
+    "origin": "pypi:aiohttp",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.11,
+    "max_blast_radius": 5,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.41,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:aiohttp": 1.0,
+      "pypi:black": 0.085,
+      "pypi:linkify-it-py": 0.004,
+      "pypi:jupytext": 0.006,
+      "pypi:hypothesis": 0.011,
+      "pypi:scikit-learn": 0.007,
+      "pallets/flask": 0.001
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:pip": {
+    "origin": "pypi:pip",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.08,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.28,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:pip": 1.0,
+      "pypi:mypy": 0.083
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:filelock": {
+    "origin": "pypi:filelock",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.18,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.41,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:filelock": 1.0,
+      "pypi:pytest-xdist": 0.088,
+      "pypi:asv": 0.09
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:feedparser": {
+    "origin": "pypi:feedparser",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.08,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.28,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:feedparser": 1.0,
+      "pypi:asv": 0.083
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:selenium": {
+    "origin": "pypi:selenium",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.09,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.29,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:selenium": 1.0,
+      "pypi:asv": 0.091
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:wheel": {
+    "origin": "pypi:wheel",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.11,
+    "max_blast_radius": 4,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.38,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:wheel": 1.0,
+      "pypi:mpmath": 0.092,
+      "pypi:scipy": 0.01,
+      "pypi:gmpy2": 0.009
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:redis": {
+    "origin": "pypi:redis",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.08,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.27,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:redis": 1.0,
+      "pypi:hypothesis": 0.077
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:django": {
+    "origin": "pypi:django",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.22,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.41,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:hypothesis": 0.216,
+      "pypi:django": 1.0
+    },
+    "exposure_score": 12.14
+  },
+  "pypi:markdown-it-py": {
+    "origin": "pypi:markdown-it-py",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.09,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.29,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:markdown-it-py": 1.0,
+      "pypi:jupytext": 0.093
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:gitpython": {
+    "origin": "pypi:gitpython",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.15,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.36,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:gitpython": 1.0,
+      "pypi:jupytext": 0.152
+    },
+    "exposure_score": 7.64
+  },
+  "pypi:jupyter-server": {
+    "origin": "pypi:jupyter-server",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.16,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.38,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:jupyter-server": 1.0,
+      "pypi:jupytext": 0.074,
+      "pypi:jupyterlite-sphinx": 0.082
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:marimo": {
+    "origin": "pypi:marimo",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.02,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.13,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 1,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:marimo": 1.0,
+      "pypi:jupytext": 0.018
+    },
+    "exposure_score": 1.29
+  },
+  "pypi:bokeh": {
+    "origin": "pypi:bokeh",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.08,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.28,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:bokeh": 1.0,
+      "pypi:myst-nb": 0.084
+    },
+    "exposure_score": 5.09
+  },
+  "pypi:nbdime": {
+    "origin": "pypi:nbdime",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.11,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.31,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:nbdime": 1.0,
+      "pypi:myst-nb": 0.108
+    },
+    "exposure_score": 5.09
+  },
+  "pypi:jupyterlite-core": {
+    "origin": "pypi:jupyterlite-core",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.18,
+    "max_blast_radius": 3,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.4,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:jupyterlite-core": 1.0,
+      "pypi:jupyterlite-pyodide-kernel": 0.097,
+      "pypi:jupyterlite-sphinx": 0.084
+    },
+    "exposure_score": 5.09
+  },
+  "pypi:jupyterlab": {
+    "origin": "pypi:jupyterlab",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.1,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.3,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:jupyterlab": 1.0,
+      "pypi:jupyterlite-pyodide-kernel": 0.099
+    },
+    "exposure_score": 5.09
+  },
+  "pypi:mkdocs": {
+    "origin": "pypi:mkdocs",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.08,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.27,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:mkdocs": 1.0,
+      "pypi:rich-click": 0.081
+    },
+    "exposure_score": 4.79
+  },
+  "pypi:mkdocs-include-markdown-plugin": {
+    "origin": "pypi:mkdocs-include-markdown-plugin",
+    "n_simulations": 1000,
+    "mean_blast_radius": 1.1,
+    "max_blast_radius": 2,
+    "min_blast_radius": 1,
+    "std_blast_radius": 0.3,
+    "p50_blast_radius": 1,
+    "p95_blast_radius": 2,
+    "critical_hit_rate": 0.0,
+    "node_infection_prob": {
+      "pypi:mkdocs-include-markdown-plugin": 1.0,
+      "pypi:rich-click": 0.101
+    },
+    "exposure_score": 4.79
+  },
+  "__summary__": {
+    "total_vulnerable_origins": 58,
+    "average_blast_radius": 1.22,
+    "highest_exposure_node": "pypi:ipython",
+    "highest_exposure_score": 40.35,
+    "systemic_risk_nodes": [
+      "pypi:sqlalchemy",
+      "pypi:lxml",
+      "pypi:feedparser",
+      "pypi:geopandas",
+      "pypi:pyarrow",
+      "pypi:redis",
+      "pypi:nbdime",
+      "pypi:scikit-learn",
+      "pypi:psutil",
+      "npm:js-yaml",
+      "pypi:orjson",
+      "pypi:html5lib",
+      "pypi:mkdocs",
+      "pypi:fiona",
+      "pypi:mpmath",
+      "pypi:jupyter-server",
+      "pypi:openpyxl",
+      "pypi:django",
+      "pypi:wheel",
+      "pypi:certifi",
+      "npm:ajv",
+      "pypi:tqdm",
+      "pypi:filelock",
+      "pypi:fonttools",
+      "pypi:aiohttp",
+      "pypi:docutils",
+      "pypi:setuptools",
+      "pypi:nbconvert",
+      "pypi:pymysql",
+      "npm:minimatch",
+      "pypi:jinja2",
+      "npm:vite",
+      "pypi:marimo",
+      "npm:rollup",
+      "pypi:jupyterlite-core",
+      "pypi:mkdocs-include-markdown-plugin",
+      "pypi:idna",
+      "pypi:gitpython",
+      "pypi:ipython",
+      "npm:tar",
+      "pypi:pip",
+      "pypi:urllib3",
+      "pypi:bokeh",
+      "pypi:jupyterlab",
+      "pypi:selenium",
+      "pypi:pygments",
+      "npm:axios",
+      "pypi:requests",
+      "pypi:markdown-it-py",
+      "pypi:paramiko",
+      "npm:flatted",
+      "pypi:numexpr",
+      "pypi:black",
+      "pypi:virtualenv",
+      "pypi:babel",
+      "pypi:pyyaml",
+      "pypi:astropy",
+      "pypi:markdown2"
+    ],
+    "systemic_risk_count": 58
+  }
+}
