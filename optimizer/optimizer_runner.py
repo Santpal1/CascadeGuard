@@ -70,6 +70,10 @@ def run_optimization(
     # Sort by benefit/cost ratio for display purposes
     items.sort(key=lambda x: x["benefit"] / max(x["cost_hours"], 0.1),
                reverse=True)
+    print("\n[optimizer] Cost/benefit preview:")
+    for item in items[:5]:
+        print(f"  {item['node']:<40} "
+            f"cost={item['cost_hours']}h  benefit={item['benefit']:.1f}")
 
     print(f"[optimizer] {len(items)} vulnerable packages to optimize")
     print(f"[optimizer] Running knapsack for budgets: {budgets} hours\n")

@@ -1,52 +1,44 @@
 import math
 
-
 def compute_risk_score(
     cvss_score: float,
     pagerank: float,
     in_degree: int,
+    mean_blast_radius: float = 0.0,
+    critical_hit_rate: float = 0.0,
+    exposure_score: float = 0.0,
     max_pagerank: float = 1.0
 ) -> float:
     """
-    Computes a composite risk score (0–100) for a dependency node.
+    Composite risk score (0-100).
 
-    Formula:
-        risk = CVSS × (1 + normalized_pagerank) × (1 + log(in_degree + 1))
+    Components:
+        CVSS score         — raw exploitability        (40%)
+        Normalized pagerank — structural importance    (25%)
+        Blast radius        — simulation mean impact   (20%)
+        Critical hit rate   — worst case probability   (15%)
 
-    Rationale:
-        - CVSS:               raw exploitability of the vulnerability
-        - pagerank multiplier: structural importance in the full graph
-                               (accounts for transitive influence)
-        - in_degree multiplier: number of packages directly depending on this
-                                one — log-scaled to prevent outliers dominating
-        - Normalized to 0–100 for readability
-
-    Args:
-        cvss_score:    float 0.0–10.0 from OSV
-        pagerank:      float from networkx, pre-computed in Module 2
-        in_degree:     int, number of direct dependents
-        max_pagerank:  float, highest pagerank in the graph (for normalization)
-
-    Returns:
-        float 0.0–100.0
+    in_degree removed as standalone factor — already captured by pagerank.
+    Simulation results integrated directly so score is dynamic, not static.
     """
     if cvss_score == 0.0:
         return 0.0
 
-    # Normalize pagerank to 0–1 range relative to the graph
-    norm_pagerank = pagerank / max_pagerank if max_pagerank > 0 else 0
+    # Normalize each input to 0-1
+    cvss_norm     = cvss_score / 10.0
+    pagerank_norm = pagerank / max_pagerank if max_pagerank > 0 else 0.0
+    br_norm       = min(mean_blast_radius / 50.0, 1.0)  # cap at 50 nodes
+    crit_norm     = critical_hit_rate  # already 0-1
 
-    # Log-scale in_degree so highly connected nodes don't explode the score
-    log_indegree = math.log(in_degree + 1)
+    # Weighted combination — no multiplication chains
+    raw = (
+        cvss_norm     * 0.40 +
+        pagerank_norm * 0.25 +
+        br_norm       * 0.20 +
+        crit_norm     * 0.15
+    )
 
-    raw = cvss_score * (1 + norm_pagerank) * (1 + log_indegree)
-
-    # CVSS max is 10, norm_pagerank max is 1, log(in_degree+1) grows slowly
-    # Theoretical max ≈ 10 × 2 × ~4 = 80 for extreme cases
-    # We cap and normalize to 100
-    normalized = min((raw / 80) * 100, 100.0)
-
-    return round(normalized, 2)
+    return round(min(raw * 100, 100.0), 2)
 
 
 def classify_risk(score: float) -> str:

@@ -26,7 +26,7 @@ def get_dependencies(name: str, version: str, ecosystem: str) -> list:
         else:
             result = []
     except Exception as e:
-        print(f"[registry] ERROR fetching {ecosystem}:{name}:{version} — {e}")
+        print(f"[registry] SKIP {ecosystem}:{name}@{version} — {e}")
         result = []
 
     _cache[cache_key] = result

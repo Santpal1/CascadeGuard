@@ -1,60 +1,50 @@
 def knapsack_optimize(items: list, budget_hours: float) -> dict:
     """
-    Solves the 0/1 Knapsack problem to find the optimal set of fixes
-    within a given engineering budget.
-
-    Args:
-        items: list of dicts, each with:
-               {node, cost_hours, benefit, risk_score, cvss_score,
-                risk_class, fix_available, ecosystem, version}
-        budget_hours: total engineering hours available
-
-    Returns:
-        {
-            "selected_fixes":      list of selected item dicts,
-            "total_cost":          float (hours used),
-            "total_benefit":       float (risk reduction achieved),
-            "remaining_budget":    float (hours left over),
-            "risk_reduction_pct":  float (% of total risk addressed),
-            "unaddressed_fixes":   list of items not selected
-        }
+    Solves 0/1 Knapsack for optimal fix selection within budget.
+    Uses integer scaling (×10) for precision with float hour values.
     """
     if not items or budget_hours <= 0:
         return _empty_result(items)
 
-    # Convert hours to integer units (multiply by 10 for 0.1h precision)
-    scale     = 10
-    W         = int(budget_hours * scale)
-    n         = len(items)
-    weights   = [max(1, int(round(item["cost_hours"] * scale))) for item in items]
-    values    = [item["benefit"] for item in items]
+    scale   = 10
+    W       = int(round(budget_hours * scale))
+    n       = len(items)
+    weights = [max(1, int(round(item["cost_hours"] * scale))) for item in items]
+    values  = [item["benefit"] for item in items]
 
-    # ── Dynamic Programming Table ──────────────────────────────────────
-    # dp[i][w] = max benefit using first i items with weight capacity w
-    # We use a 1D rolling array to save memory
-    dp = [0.0] * (W + 1)
+    # Debug — uncomment if budget issues recur
+    # print(f"[knapsack] W={W}, weights={weights}, budget={budget_hours}")
 
-    for i in range(n):
-        w_i = weights[i]
-        v_i = values[i]
-        # Traverse backwards to prevent using same item twice (0/1 knapsack)
-        for w in range(W, w_i - 1, -1):
-            dp[w] = max(dp[w], dp[w - w_i] + v_i)
+    # ── DP table (2D for reliable backtracking) ────────────────────────
+    # dp[i][w] = max benefit using first i items with capacity w
+    dp = [[0.0] * (W + 1) for _ in range(n + 1)]
 
-    # ── Backtrack to find selected items ──────────────────────────────
+    for i in range(1, n + 1):
+        w_i = weights[i - 1]
+        v_i = values[i - 1]
+        for w in range(W + 1):
+            # Don't take item i
+            dp[i][w] = dp[i - 1][w]
+            # Take item i if it fits
+            if w >= w_i:
+                dp[i][w] = max(dp[i][w], dp[i - 1][w - w_i] + v_i)
+
+    # ── Backtrack to find which items were selected ────────────────────
     selected_indices = []
     w = W
-    for i in range(n - 1, -1, -1):
-        w_i = weights[i]
-        v_i = values[i]
-        if w >= w_i and abs(dp[w] - dp[w - w_i] - v_i) < 1e-6:
-            selected_indices.append(i)
-            w -= w_i
+    for i in range(n, 0, -1):
+        # If value changed from row above, item i was selected
+        if dp[i][w] != dp[i - 1][w]:
+            selected_indices.append(i - 1)  # convert to 0-indexed
+            w -= weights[i - 1]
+            if w <= 0:
+                break
 
-    selected_indices.reverse()  # restore original order
+    selected_indices.reverse()
 
-    selected = [items[i] for i in selected_indices]
-    unselected = [items[i] for i in range(n) if i not in set(selected_indices)]
+    selected   = [items[i] for i in selected_indices]
+    unselected = [items[i] for i in range(n)
+                  if i not in set(selected_indices)]
 
     total_cost    = sum(item["cost_hours"] for item in selected)
     total_benefit = sum(item["benefit"] for item in selected)

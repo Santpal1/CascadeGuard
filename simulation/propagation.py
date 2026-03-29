@@ -4,38 +4,37 @@ import networkx as nx
 
 def compute_propagation_probability(
     source_cvss: float,
-    target_risk_score: float
+    target_risk_score: float,
+    source_depth: int = 1,
+    max_depth: int = 3
 ) -> float:
     """
-    Computes the probability that an attack spreads from a compromised
-    node to a dependent node.
+    Probability of attack spreading from compromised node to dependent.
 
-    Formula:
-        P = base_p × cvss_factor × (1 - target_resistance)
+    Grounded factors:
+        cvss_factor:    higher severity = spreads more easily
+        depth_factor:   closer to root = higher impact (shallower = worse)
+        resistance:     target's own risk score (higher risk = less resistant)
 
-    Where:
-        base_p           = 0.5 (baseline 50% chance any edge is exploited)
-        cvss_factor      = CVSS/10 (higher severity = more likely to spread)
-        target_resistance = target's own risk score normalized 0-1
-                           (a well-patched, low-risk node resists better)
-
-    This means:
-        - CVSS 10.0 vulnerability has base 50% × 100% = 50% spread chance
-        - CVSS 4.0 vulnerability has base 50% × 40%  = 20% spread chance
-        - A high-risk target node is EASIER to infect (less resistance)
-        - A clean target node is harder to infect
+    Capped between 0.05 and 0.90 — never impossible, never certain.
     """
-    base_p = 0.5
-    cvss_factor = source_cvss / 10.0
+    # Factor 1: CVSS drives base probability
+    cvss_factor = source_cvss / 10.0  # 0.0 to 1.0
 
-    # Target resistance: higher risk_score = already vulnerable = less resistance
-    # Normalize target risk_score from 0-100 to 0-1
-    target_resistance = 1.0 - (min(target_risk_score, 100) / 100.0)
-    # Clamp resistance between 0.1 and 0.9 — never impossible, never certain
-    target_resistance = max(0.1, min(0.9, target_resistance))
+    # Factor 2: depth — attacks closer to root spread more reliably
+    # depth 1 = direct dep = factor 1.0
+    # depth 3 = transitive  = factor 0.6
+    depth_factor = 1.0 - (source_depth - 1) * (0.2 / max(max_depth - 1, 1))
+    depth_factor = max(0.4, depth_factor)
 
-    probability = base_p * cvss_factor * (1.0 - target_resistance * 0.5)
-    return round(min(probability, 0.95), 4)  # cap at 95%
+    # Factor 3: target resistance — high risk targets are easier to infect
+    resistance = 1.0 - (min(target_risk_score, 100) / 100.0)
+    resistance = max(0.2, min(0.8, resistance))  # clamp 0.2-0.8
+
+    probability = 0.5 * cvss_factor * depth_factor * (1.0 - resistance * 0.4)
+
+    # Hard clamp — never impossible, never certain
+    return round(max(0.05, min(0.90, probability)), 4)
 
 
 def run_single_simulation(
@@ -98,7 +97,13 @@ def run_single_simulation(
                 dep_data = G.nodes.get(dependent, {})
                 dep_risk = dep_data.get("risk_score", 0.0)
 
-                prob = compute_propagation_probability(node_cvss, dep_risk)
+                # In run_single_simulation, replace the prob line with:
+                source_depth = G.nodes[node].get("depth", 1)
+                prob = compute_propagation_probability(
+                    node_cvss, dep_risk,
+                    source_depth=source_depth,
+                    max_depth=3
+                )
 
                 if random.random() < prob:
                     compromised.add(dependent)

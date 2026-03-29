@@ -260,7 +260,32 @@ def _cvss_to_label(score: float) -> str:
 
 
 def _clean_version(version: str) -> str:
-    """Strips specifiers like >=, ~= to get a bare version number."""
+    """
+    Resolves version specifiers to a usable version string.
+
+    Handles:
+        '>=2.0.0'     -> '2.0.0'  (use minimum compatible)
+        '^4.18.2'     -> '4.18.2' (caret = compatible with)
+        '~=3.1.2'     -> '3.1.2'  (compatible release)
+        '2.0.0,<3.0'  -> '2.0.0'  (range, take lower bound)
+        'unspecified' -> ''        (let registry return latest)
+    """
     import re
-    cleaned = re.sub(r'^[^0-9]*', '', version)
-    return cleaned.split(",")[0].strip() or version
+
+    if not version or version in ("unspecified", "inherited-from-parent"):
+        return ""
+
+    # Strip leading operators and spaces
+    cleaned = re.sub(r'^[\^~=><! ]+', '', version.strip())
+
+    # If range like '>=1.0.0,<2.0.0' take the first (lower) bound
+    cleaned = cleaned.split(",")[0].strip()
+
+    # Strip anything after whitespace (e.g. '2.0.0 ; python_requires')
+    cleaned = cleaned.split()[0] if cleaned else ""
+
+    # Validate it looks like a version
+    if not re.match(r'^\d+', cleaned):
+        return ""
+
+    return cleaned

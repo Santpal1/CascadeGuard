@@ -1,6 +1,6 @@
 import networkx as nx
 from graph.registry_client import get_dependencies
-
+MAX_NODES = 500
 
 def build_graph(packages: list, repo_name: str = "root", max_depth: int = 3) -> nx.DiGraph:
     """
@@ -68,6 +68,9 @@ def _resolve_transitive(
     next_level = []
 
     for pkg in packages:
+        if G.number_of_nodes() >= MAX_NODES:
+            print(f"[graph] Node cap ({MAX_NODES}) reached — stopping expansion")
+            return
         node_id = _node_id(pkg)
         print(f"[graph] Resolving depth {current_depth+1}: {node_id}")
 

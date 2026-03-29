@@ -6,8 +6,76 @@ import os
 from risk.osv_client import query_vulnerabilities
 from risk.scorer import compute_risk_score, classify_risk
 
+def _aggregate_cvss(vulns: list) -> float:
+    """
+    Aggregates CVSS scores across all vulnerabilities.
+    Uses max score but boosts for multiple highs and critical presence.
 
-def enrich_graph(G: nx.DiGraph) -> nx.DiGraph:
+    Better than raw max because:
+        - 1 critical + 5 highs is worse than just 1 critical
+        - Volume of vulnerabilities indicates systemic neglect
+    """
+    if not vulns:
+        return 0.0
+
+    scores = [v["cvss_score"] for v in vulns if v["cvss_score"] > 0]
+    if not scores:
+        return 0.0
+
+    max_score    = max(scores)
+    has_critical = any(v["severity"] == "CRITICAL" for v in vulns)
+    vuln_count   = len(scores)
+
+    # Volume bonus: many vulns = slightly higher effective score
+    volume_bonus = min(vuln_count * 0.05, 0.5)
+
+    # Critical presence bonus
+    critical_bonus = 0.3 if has_critical else 0.0
+
+    aggregated = min(max_score + volume_bonus + critical_bonus, 10.0)
+    return round(aggregated, 2)
+
+def _build_explanation(node: str, data: dict, sim: dict) -> str:
+    """
+    Generates a human-readable explanation of why a node is risky.
+    Stored as node attribute, used by dashboard and reports.
+    """
+    reasons = []
+
+    cvss = data.get("cvss_score", 0)
+    if cvss >= 9.0:
+        reasons.append(f"Critical CVSS {cvss}")
+    elif cvss >= 7.0:
+        reasons.append(f"High CVSS {cvss}")
+    elif cvss > 0:
+        reasons.append(f"CVSS {cvss}")
+
+    pagerank = data.get("pagerank", 0)
+    if pagerank > 0.05:
+        reasons.append("high graph centrality")
+
+    in_deg = data.get("in_degree", 0)
+    if in_deg >= 3:
+        reasons.append(f"{in_deg} packages depend on it")
+
+    br = sim.get("mean_blast_radius", 0)
+    if br >= 3:
+        reasons.append(f"blast radius {br:.1f} nodes on average")
+
+    crit_rate = sim.get("critical_hit_rate", 0)
+    if crit_rate >= 0.5:
+        reasons.append(f"{crit_rate*100:.0f}% chance of critical cascade")
+
+    vuln_count = data.get("vuln_count", 0)
+    if vuln_count >= 5:
+        reasons.append(f"{vuln_count} known vulnerabilities")
+
+    if not reasons:
+        return "Low severity vulnerability with minimal graph impact"
+
+    return " + ".join(reasons)
+
+def enrich_graph(G: nx.DiGraph, simulation_results: dict = None) -> nx.DiGraph:
     """
     Main entry point for Module 3.
 
@@ -56,10 +124,7 @@ def enrich_graph(G: nx.DiGraph) -> nx.DiGraph:
         vulns = query_vulnerabilities(name, version, ecosystem)
 
         # Pick the worst CVSS score across all vulnerabilities
-        cvss_score = max(
-            (v["cvss_score"] for v in vulns),
-            default=0.0
-        )
+        cvss_score = _aggregate_cvss(vulns)
 
         fix_available = any(v["fixed_in"] is not None for v in vulns)
 
@@ -85,6 +150,8 @@ def enrich_graph(G: nx.DiGraph) -> nx.DiGraph:
             total_vulns += len(vulns)
             if risk_class == "CRITICAL":
                 critical_nodes += 1
+    sim = simulation_results.get(node, {}) if simulation_results else {}
+    G.nodes[node]["explanation"] = _build_explanation(node, G.nodes[node], sim)
 
     print(f"\n[enricher] ── Enrichment Summary ─────────────────────")
     print(f"[enricher] Nodes scanned:      {len(nodes)}")
@@ -95,6 +162,43 @@ def enrich_graph(G: nx.DiGraph) -> nx.DiGraph:
 
     return G
 
+def rescore_after_simulation(G: nx.DiGraph, simulation_results: dict) -> nx.DiGraph:
+    """
+    Re-computes risk scores after simulation results are available.
+    Called after run_full_simulation() in main.py.
+    Updates each node's risk_score and risk_class with simulation data.
+    """
+    from risk.scorer import compute_risk_score, classify_risk
+
+    all_pageranks = [
+        d.get("pagerank", 0) for _, d in G.nodes(data=True)
+        if d.get("ecosystem") != "root"
+    ]
+    max_pagerank = max(all_pageranks) if all_pageranks else 1.0
+
+    print("\n[enricher] Re-scoring nodes with simulation data...")
+
+    for node, data in G.nodes(data=True):
+        if data.get("ecosystem") == "root":
+            continue
+
+        sim = simulation_results.get(node, {})
+
+        new_score = compute_risk_score(
+            cvss_score         = data.get("cvss_score", 0.0),
+            pagerank           = data.get("pagerank", 0.0),
+            in_degree          = data.get("in_degree", 0),
+            mean_blast_radius  = sim.get("mean_blast_radius", 0.0),
+            critical_hit_rate  = sim.get("critical_hit_rate", 0.0),
+            exposure_score     = sim.get("exposure_score", 0.0),
+            max_pagerank       = max_pagerank
+        )
+
+        G.nodes[node]["risk_score"]  = new_score
+        G.nodes[node]["risk_class"]  = classify_risk(new_score)
+
+    print("[enricher] Re-scoring complete.")
+    return G
 
 def export_enriched_graph(G: nx.DiGraph, path: str = "output/enriched_graph.json"):
     """Saves the enriched graph to JSON for Ayan's simulation module."""
