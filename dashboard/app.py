@@ -623,13 +623,13 @@ with tab2:
             color    = RISK_COLORS.get(rc, "#8b949e")
             size     = 10 + data.get("pagerank", 0) * 800
             size     = max(8, min(size, 40))
-            title    = (
-                f"<b>{node}</b><br>"
-                f"Version: {data.get('version','—')}<br>"
-                f"Risk: {rc} ({rs:.1f})<br>"
-                f"CVSS: {data.get('cvss_score',0)}<br>"
-                f"Vulns: {data.get('vuln_count',0)}<br>"
-                f"{data.get('explanation','')}"
+            title = (
+                f"Package: {node}\n"
+                f"Version: {data.get('version','—')}\n"
+                f"Risk: {rc} ({rs:.1f})\n"
+                f"CVSS: {data.get('cvss_score',0)}\n"
+                f"Vulns: {data.get('vuln_count',0)}\n"
+                f"{'⚠ ' + data.get('explanation','') if data.get('explanation') else ''}"
             )
             if eco == "root":
                 color = "#58a6ff"
@@ -706,13 +706,13 @@ with tab3:
 
     sim_data = [
         {
-            "package":         node,
-            "exposure_score":  data["exposure_score"],
+            "package":           node,
+            "exposure_score":    data["exposure_score"],
             "mean_blast_radius": data["mean_blast_radius"],
             "p95_blast_radius":  data["p95_blast_radius"],
             "critical_hit_rate": data["critical_hit_rate"] * 100,
-            "cvss_score":      G.nodes[node].get("cvss_score", 0),
-            "risk_class":      G.nodes[node].get("risk_class", "CLEAN"),
+            "cvss_score":        G.nodes[node].get("cvss_score", 0),
+            "risk_class":        G.nodes[node].get("risk_class", "CLEAN"),
         }
         for node, data in results.items()
         if isinstance(data, dict) and "exposure_score" in data
@@ -725,6 +725,359 @@ with tab3:
             "exposure_score", ascending=False
         )
 
+        # ── Origin node selector ──────────────────────────────────────────
+        st.markdown("### 🎯 Blast Radius Animator")
+        st.markdown(
+            "<div style='color:#8b949e; font-size:13px; margin-bottom:16px;'>"
+            "Select an attack origin to animate how compromise spreads "
+            "through the dependency graph in real time."
+            "</div>",
+            unsafe_allow_html=True
+        )
+
+        origin_options = sim_df["package"].tolist()
+        selected_origin = st.selectbox(
+            "Attack origin node",
+            origin_options,
+            format_func=lambda x: f"{x.split(':')[-1]} "
+                                  f"(CVSS {G.nodes[x].get('cvss_score',0):.1f}, "
+                                  f"{G.nodes[x].get('risk_class','—')})"
+        )
+
+        # ── Build animated graph ──────────────────────────────────────────
+        if selected_origin:
+            from simulation.propagation import run_single_simulation
+
+            sim_result = run_single_simulation(G, selected_origin, seed=42)
+            path       = sim_result["propagation_path"]
+
+            # ── KEY CHANGE: only show relevant subgraph ───────────────────
+            # Include: origin + all nodes reachable from origin (descendants)
+            # + direct predecessors of origin (what depends on it)
+            # + nodes in propagation path
+            # This keeps the graph focused and readable
+
+            relevant_nodes = set(path)
+
+            # Add 2-hop neighborhood of origin
+            for neighbor in list(G.predecessors(selected_origin)):
+                relevant_nodes.add(neighbor)
+                for n2 in G.predecessors(neighbor):
+                    relevant_nodes.add(n2)
+
+            for neighbor in list(G.successors(selected_origin)):
+                relevant_nodes.add(neighbor)
+                for n2 in G.successors(neighbor):
+                    relevant_nodes.add(n2)
+
+            # Always include root node
+            for node, data in G.nodes(data=True):
+                if data.get("ecosystem") == "root":
+                    relevant_nodes.add(node)
+
+            # Cap at 60 nodes for readability
+            if len(relevant_nodes) > 60:
+                # Prioritize: path nodes first, then by risk score
+                path_set  = set(path)
+                others    = sorted(
+                    relevant_nodes - path_set,
+                    key=lambda n: G.nodes[n].get("risk_score", 0),
+                    reverse=True
+                )
+                relevant_nodes = path_set | set(others[:60 - len(path_set)])
+
+            sub_G      = G.subgraph(relevant_nodes).copy()
+            sub_nodes  = list(sub_G.nodes())
+            pos        = nx.spring_layout(sub_G, seed=42, k=3.0)
+
+            node_x = [pos[n][0] for n in sub_nodes]
+            node_y = [pos[n][1] for n in sub_nodes]
+
+            def get_node_color(n, revealed_set, origin):
+                if n == origin:         return "#ff4444"
+                if n in revealed_set:
+                    rc = G.nodes[n].get("risk_class", "CLEAN")
+                    return RISK_COLORS.get(rc, "#ff7b72")
+                eco = G.nodes[n].get("ecosystem", "")
+                if eco == "root":       return "#58a6ff"
+                return "#21262d"
+
+            def get_node_size(n, revealed_set):
+                base = 12 + G.nodes[n].get("pagerank", 0) * 800
+                if n in revealed_set:   return min(base * 1.8, 45)
+                return max(base, 10)
+
+            # Static edges
+            edge_x, edge_y = [], []
+            for src, tgt in sub_G.edges():
+                x0, y0 = pos[src]
+                x1, y1 = pos[tgt]
+                edge_x += [x0, x1, None]
+                edge_y += [y0, y1, None]
+
+            # Highlight edges IN the propagation path
+            attack_edge_x, attack_edge_y = [], []
+            for i in range(len(path) - 1):
+                if path[i] in pos and path[i+1] in pos:
+                    x0, y0 = pos[path[i]]
+                    x1, y1 = pos[path[i+1]]
+                    attack_edge_x += [x0, x1, None]
+                    attack_edge_y += [y0, y1, None]
+
+            edge_trace = go.Scatter(
+                x=edge_x, y=edge_y, mode="lines",
+                line=dict(color="#30363d", width=0.8),
+                hoverinfo="none", showlegend=False
+            )
+
+            # Build frames
+            frames  = []
+            revealed = set()
+
+            for step_idx, node_at_step in enumerate(path):
+                if node_at_step not in sub_nodes:
+                    continue
+                revealed.add(node_at_step)
+
+                # Attack edge up to this step
+                atk_x, atk_y = [], []
+                for i in range(min(step_idx, len(path) - 1)):
+                    if path[i] in pos and path[i+1] in pos:
+                        x0,y0 = pos[path[i]]
+                        x1,y1 = pos[path[i+1]]
+                        atk_x += [x0, x1, None]
+                        atk_y += [y0, y1, None]
+
+                atk_edge_trace = go.Scatter(
+                    x=atk_x, y=atk_y, mode="lines",
+                    line=dict(color="#ff4444", width=2.5,
+                              dash="dot"),
+                    hoverinfo="none", showlegend=False
+                )
+
+                colors    = [get_node_color(n, revealed, selected_origin)
+                             for n in sub_nodes]
+                sizes     = [get_node_size(n, revealed) for n in sub_nodes]
+                opacities = [1.0 if n in revealed else 0.3
+                             for n in sub_nodes]
+                labels    = [n.split(":")[-1] if ":" in n else n
+                             for n in sub_nodes]
+                hover_texts = [
+                    f"{n}\nRisk: {G.nodes[n].get('risk_class','—')}"
+                    f"\nCVSS: {G.nodes[n].get('cvss_score',0):.1f}"
+                    f"\n{G.nodes[n].get('explanation','')}"
+                    for n in sub_nodes
+                ]
+
+                node_trace = go.Scatter(
+                    x=node_x, y=node_y,
+                    mode="markers+text",
+                    marker=dict(
+                        color=colors, size=sizes,
+                        opacity=opacities,
+                        line=dict(
+                            color=["#ff4444" if n == selected_origin
+                                   else "#ff7b72" if n in revealed
+                                   else "#30363d"
+                                   for n in sub_nodes],
+                            width=[3 if n in revealed else 0.5
+                                   for n in sub_nodes]
+                        )
+                    ),
+                    text=labels,
+                    textposition="top center",
+                    textfont=dict(
+                        color=["#ff7b72" if n in revealed
+                               else "#555" for n in sub_nodes],
+                        size=[11 if n in revealed else 9
+                              for n in sub_nodes]
+                    ),
+                    hovertext=hover_texts,
+                    hoverinfo="text",
+                    showlegend=False
+                )
+
+                frames.append(go.Frame(
+                    data=[edge_trace, atk_edge_trace, node_trace],
+                    name=str(step_idx),
+                    layout=go.Layout(annotations=[dict(
+                        x=0.01, y=0.99,
+                        xref="paper", yref="paper",
+                        text=(
+                            f"<b>Step {step_idx + 1}/{len(path)}</b>  "
+                            f"Compromised: {len(revealed)} node(s)  "
+                            f"Latest: {node_at_step.split(':')[-1]}"
+                        ),
+                        showarrow=False,
+                        bgcolor="#161b22",
+                        bordercolor="#ff4444",
+                        borderwidth=1,
+                        borderpad=10,
+                        font=dict(color="#e6edf3", size=13),
+                        align="left",
+                        xanchor="left", yanchor="top"
+                    )])
+                ))
+
+            if not frames:
+                st.info("This node had no propagation in the seed simulation. "
+                        "Try a different origin or check simulation results.")
+            else:
+                # Initial state
+                init_colors = [get_node_color(n, {selected_origin},
+                                              selected_origin)
+                               for n in sub_nodes]
+                init_sizes  = [get_node_size(n, {selected_origin})
+                               for n in sub_nodes]
+                init_node   = go.Scatter(
+                    x=node_x, y=node_y,
+                    mode="markers+text",
+                    marker=dict(
+                        color=init_colors, size=init_sizes,
+                        opacity=[1.0 if n == selected_origin
+                                 else 0.3 for n in sub_nodes],
+                        line=dict(
+                            color=["#ff4444" if n == selected_origin
+                                   else "#30363d" for n in sub_nodes],
+                            width=[3 if n == selected_origin
+                                   else 0.5 for n in sub_nodes]
+                        )
+                    ),
+                    text=[n.split(":")[-1] if ":" in n else n
+                          for n in sub_nodes],
+                    textposition="top center",
+                    textfont=dict(color="#8b949e", size=9),
+                    hoverinfo="none", showlegend=False
+                )
+
+                empty_atk = go.Scatter(
+                    x=[], y=[], mode="lines",
+                    line=dict(color="#ff4444", width=2.5, dash="dot"),
+                    hoverinfo="none", showlegend=False
+                )
+
+                fig_anim = go.Figure(
+                    data=[edge_trace, empty_atk, init_node],
+                    frames=frames,
+                    layout=go.Layout(
+                        paper_bgcolor="rgba(0,0,0,0)",
+                        plot_bgcolor="#0d1117",
+                        xaxis=dict(showgrid=False, zeroline=False,
+                                   showticklabels=False),
+                        yaxis=dict(showgrid=False, zeroline=False,
+                                   showticklabels=False),
+                        height=580,
+                        margin=dict(t=30, b=80, l=20, r=20),
+                        updatemenus=[dict(
+                            type="buttons",
+                            showactive=False,
+                            y=0.02, x=0.5,
+                            xanchor="center", yanchor="bottom",
+                            bgcolor="#161b22",
+                            bordercolor="#30363d",
+                            font=dict(color="#e6edf3", size=13),
+                            buttons=[
+                                dict(
+                                    label="▶  Play Attack",
+                                    method="animate",
+                                    args=[None, dict(
+                                        frame=dict(duration=700,
+                                                   redraw=True),
+                                        fromcurrent=True,
+                                        transition=dict(
+                                            duration=400,
+                                            easing="cubic-in-out"
+                                        )
+                                    )]
+                                ),
+                                dict(
+                                    label="⏸  Pause",
+                                    method="animate",
+                                    args=[[None], dict(
+                                        frame=dict(duration=0,
+                                                   redraw=False),
+                                        mode="immediate",
+                                        transition=dict(duration=0)
+                                    )]
+                                ),
+                                dict(
+                                    label="↺  Reset",
+                                    method="animate",
+                                    args=[["0"], dict(
+                                        mode="immediate",
+                                        frame=dict(duration=0,
+                                                   redraw=True),
+                                        transition=dict(duration=0)
+                                    )]
+                                )
+                            ]
+                        )],
+                        sliders=[dict(
+                            active=0,
+                            currentvalue=dict(
+                                prefix="Step: ",
+                                font=dict(color="#8b949e", size=12)
+                            ),
+                            pad=dict(t=50, b=10),
+                            bgcolor="#161b22",
+                            bordercolor="#30363d",
+                            tickcolor="#30363d",
+                            font=dict(color="#8b949e"),
+                            steps=[
+                                dict(
+                                    method="animate",
+                                    args=[[str(k)], dict(
+                                        mode="immediate",
+                                        frame=dict(duration=300,
+                                                   redraw=True),
+                                        transition=dict(duration=150)
+                                    )],
+                                    label=str(k + 1)
+                                )
+                                for k in range(len(frames))
+                            ]
+                        )]
+                    )
+                )
+
+                st.plotly_chart(fig_anim, use_container_width=True)
+
+                # Insight callout below animation
+                br = sim_result["blast_radius"]
+                sim_node = results.get(selected_origin, {})
+                mean_br  = sim_node.get("mean_blast_radius", 0)
+                p95_br   = sim_node.get("p95_blast_radius", 0)
+                crit_rate = sim_node.get("critical_hit_rate", 0)
+
+                if br <= 2:
+                    insight = (
+                        f"This package has a **contained blast radius** "
+                        f"in this simulation run ({br} node(s) affected). "
+                        f"Across 1000 simulations the mean is "
+                        f"**{mean_br:.1f} nodes** with a worst-case of "
+                        f"**{p95_br} nodes**. "
+                        f"{'⚠️ Critical cascade probability: '  + str(round(crit_rate*100,1)) + '%' if crit_rate > 0 else ''}"
+                    )
+                else:
+                    insight = (
+                        f"This attack propagated to **{br} nodes** "
+                        f"in this simulation run. "
+                        f"Across 1000 simulations the mean blast radius is "
+                        f"**{mean_br:.1f} nodes** with a worst-case P95 of "
+                        f"**{p95_br} nodes**."
+                    )
+                st.info(insight)
+
+                s1, s2, s3, s4 = st.columns(4)
+                s1.metric("This Run — Blast Radius", br)
+                s2.metric("Mean (1000 runs)",
+                          f"{mean_br:.1f}")
+                s3.metric("P95 Worst Case", p95_br)
+                s4.metric("Critical Hit Rate",
+                          f"{crit_rate*100:.1f}%")
+
+        # ── Aggregate charts ──────────────────────────────────────────────
+        st.markdown("### 📊 Simulation Aggregate Results")
         c1, c2 = st.columns(2, gap="large")
 
         with c1:
@@ -756,7 +1109,7 @@ with tab3:
             st.plotly_chart(fig_exp, use_container_width=True)
 
         with c2:
-            st.markdown("**Blast Radius Distribution**")
+            st.markdown("**Blast Radius — Mean vs P95 Worst Case**")
             fig_br = go.Figure()
             fig_br.add_trace(go.Bar(
                 name="Mean",
@@ -766,7 +1119,7 @@ with tab3:
                 opacity=0.85
             ))
             fig_br.add_trace(go.Bar(
-                name="P95 (worst case)",
+                name="P95 worst case",
                 x=sim_df["package"].str.split(":").str[-1],
                 y=sim_df["p95_blast_radius"],
                 marker_color="#ff7b72",
@@ -779,14 +1132,15 @@ with tab3:
                 xaxis=dict(showgrid=False, color="#8b949e",
                            tickangle=-30),
                 yaxis=dict(showgrid=True, gridcolor="#30363d",
-                           color="#8b949e", title="Nodes affected"),
+                           color="#8b949e",
+                           title="Nodes affected"),
                 legend=dict(font=dict(color="#e6edf3")),
                 margin=dict(t=10, b=60, l=10, r=10),
                 height=350,
             )
             st.plotly_chart(fig_br, use_container_width=True)
 
-        # Critical hit rate scatter
+        # Scatter
         st.markdown("**Critical Hit Rate vs Exposure Score**")
         fig_scatter = px.scatter(
             sim_df,
@@ -805,9 +1159,11 @@ with tab3:
         )
         fig_scatter.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor ="#161b22",
-            xaxis=dict(showgrid=True, gridcolor="#30363d", color="#8b949e"),
-            yaxis=dict(showgrid=True, gridcolor="#30363d", color="#8b949e"),
+            plot_bgcolor="#161b22",
+            xaxis=dict(showgrid=True, gridcolor="#30363d",
+                       color="#8b949e"),
+            yaxis=dict(showgrid=True, gridcolor="#30363d",
+                       color="#8b949e"),
             legend=dict(font=dict(color="#e6edf3"),
                         bgcolor="rgba(0,0,0,0)"),
             height=350,
@@ -819,20 +1175,24 @@ with tab3:
         summary = sim_all.get("__summary__", {})
         systemic = summary.get("systemic_risk_nodes", [])
         if systemic:
-            st.markdown("**Systemic Risk Nodes** *(infected in >50% of all simulations)*")
+            st.markdown(
+                "**Systemic Risk Nodes** "
+                "*(infected in >50% of all simulations)*"
+            )
             cols = st.columns(min(len(systemic), 4))
             for i, node in enumerate(systemic[:8]):
-                rc = G.nodes[node].get("risk_class", "CLEAN") if node in G.nodes else "UNKNOWN"
+                rc = G.nodes[node].get("risk_class", "CLEAN") \
+                     if node in G.nodes else "UNKNOWN"
                 with cols[i % 4]:
                     st.markdown(
                         f'<div class="info-card" style="text-align:center;">'
                         f'<div style="font-size:12px; color:#e6edf3; '
-                        f'font-weight:600;">{node.split(":")[-1]}</div>'
+                        f'font-weight:600;">'
+                        f'{node.split(":")[-1]}</div>'
                         f'<div style="margin-top:8px;">{badge(rc)}</div>'
                         f'</div>',
                         unsafe_allow_html=True
                     )
-
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 4 — MITIGATION PLAN
