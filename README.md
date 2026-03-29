@@ -420,3 +420,367 @@ Output: Risk reports, threat profiles, cascading attack scenarios
 - **CascadeGuard is not just a vulnerability scanner**—it's a **risk propagation engine** that identifies which vulnerabilities pose the greatest threat based on dependency structure and cascading compromise scenarios
 - **A low-CVSS vulnerability affecting a central package** can be riskier than **a high-CVSS vulnerability in an obscure package**
 - The **simulation module** quantifies this by running thousands of attack scenarios and measuring how far each compromise spreads
+
+---
+
+## **Module 5: Optimization** (optimizer)
+
+**Purpose:** Recommend which vulnerable packages to fix first, given a limited engineering budget, to maximize risk reduction.
+
+### Key Components
+
+#### **cost_estimator.py**
+
+**`estimate_fix_cost(node, data, G) → float`**
+
+Estimates the engineering hours required to fix a vulnerable package using a multi-factor model:
+
+**Formula:**
+```
+cost = base_hours 
+     × ecosystem_complexity_factor
+     × dependent_complexity_factor
+     × version_lag_factor
+```
+
+**Factors:**
+
+1. **Base Hours** – 2.0 hours baseline
+2. **Ecosystem Complexity:**
+   - PyPI: 1.0× (straightforward pip upgrade)
+   - npm: 1.2× (node_modules cascading breaks)
+   - Maven: 1.5× (often requires code changes)
+3. **Dependent Complexity** – Based on in-degree (how many packages depend on this):
+   - 0 dependents: 1.0×
+   - 1–2 dependents: 1.3×
+   - 3–5 dependents: 1.7×
+   - 6+ dependents: 2.2×
+4. **Version Lag Factor** – Historical gap between current and fixed version (1.0–2.0×)
+
+**Example:** A Maven package with 5 dependents and version lag 2.0 = 2.0 × 1.5 × 1.7 × 1.5 ≈ 7.65 hours
+
+**`estimate_fix_benefit(node, data) → float`**
+
+Estimates the risk reduction value from fixing a vulnerable package:
+
+**Combines:**
+- **Risk Score** – Vulnerability severity × centrality (from Module 3)
+- **Exposure Score** – Blast radius impact from simulations (from Module 4)
+- **Mean Blast Radius** – Average packages protected if this is fixed
+- **Fix Penalty** – Large penalty if no fix is available
+
+**Rationale:** Higher benefit = more valuable to fix, prioritizing packages that are both vulnerable AND central to the dependency graph
+
+#### **knapsack.py**
+
+**`knapsack_optimize(items, budget_hours) → dict`**
+
+Solves the **0/1 Knapsack Problem** for optimal fix selection:
+
+- **Items** = vulnerable packages (each with cost and benefit)
+- **Capacity** = total engineering budget in hours
+- **Goal** = maximize total benefit while staying within budget
+
+**Algorithm:**
+1. Build DP table where `dp[i][w]` = max benefit using first i items with capacity w
+2. Backtrack through DP table to identify which items were selected
+3. Return selected fixes, total cost, total benefit, and risk reduction %
+
+**Output:**
+```python
+{
+    "selected_fixes":     list[dict],    # Packages to fix
+    "total_cost":         float,         # Hours used
+    "total_benefit":      float,         # Risk reduction value
+    "remaining_budget":   float,         # Leftover hours
+    "risk_reduction_pct": float,         # % of total risk covered
+    "unaddressed_fixes":  list[dict],    # Packages not selected
+}
+```
+
+**Example:** With 40 hours budget, optimizer selects 12 critical packages covering 78% of overall risk
+
+#### **optimizer_runner.py**
+
+**`run_optimization(G, simulation_results, budgets=[8,16,24,40], output_path) → dict`**
+
+Main orchestrator that:
+
+1. Builds cost/benefit profile for every vulnerable non-root node
+2. Runs knapsack optimizer for multiple budget scenarios (default: 8, 16, 24, 40 hours)
+3. For each budget level, outputs:
+   - Packages to fix (prioritized by benefit/cost ratio)
+   - Total hours required
+   - Risk reduction percentage
+   - Unaddressed vulns (insufficient budget or no fix available)
+4. Saves full mitigation plan to `output/mitigation_plan.json`
+
+**Output Structure:**
+```python
+{
+    "total_vulnerable_packages": int,
+    "all_items_ranked": list[dict],     # All vulns ranked by benefit/cost
+    "budget_scenarios": {
+        8: { ... },      # Plan for 8-hour budget
+        16: { ... },     # Plan for 16-hour budget
+        24: { ... },     # Plan for 24-hour budget
+        40: { ... },     # Plan for 40-hour budget (recommended)
+    }
+}
+```
+
+**Example Output:**
+```
+[optimizer] Budget  40h → fixes 12 packages, uses  35.2h, covers 78.3% of risk
+[optimizer] Budget  24h → fixes  8 packages, uses  23.9h, covers 65.1% of risk
+[optimizer] Budget  16h → fixes  5 packages, uses  15.8h, covers 48.2% of risk
+[optimizer] Budget   8h → fixes  2 packages, uses   7.5h, covers 25.0% of risk
+```
+
+---
+
+## **Module 6: Interactive Dashboard** (dashboard)
+
+**Purpose:** Visualize the entire CascadeGuard analysis pipeline in an interactive Streamlit web application.
+
+### Overview
+
+The **Streamlit Dashboard** (`dashboard/app.py`) provides a comprehensive interface for analyzing, visualizing, and acting on supply chain risk:
+
+- **Real-time GitHub ingestion** – Paste any GitHub URL and run live analysis
+- **Cached results** – Load previous analyses without re-running the full pipeline
+- **Interactive visualization** – Explore dependency graphs and vulnerability heat maps
+- **Risk scoring & simulation** – View Monte Carlo blast radius statistics
+- **Mitigation planning** – Access knapsack-optimized fix recommendations
+
+### Features
+
+#### **Landing Page**
+
+When first loaded, displays:
+- Project description: "Zero-Trust Software Supply Chain Risk Intelligence"
+- Three info cards:
+  - 🕸️ **Graph Analysis** – Full dependency graph up to 3 levels deep (PyPI, npm, Maven)
+  - 🎲 **Monte Carlo Simulation** – 1000 attack propagation simulations per vulnerable node
+  - ⚡ **Smart Prioritization** – Knapsack optimization for budget-constrained fixes
+
+#### **Sidebar Controls**
+
+- **GitHub URL Input** – Paste repository URL (e.g., https://github.com/pallets/flask)
+- **Run Live Analysis** – Executes the full 5-module pipeline with progress tracking
+- **Load Cached Results** – Retrieves previous analysis from `output/` directory
+- **Settings:**
+  - Dependency depth slider (1–5, default 3)
+  - Simulation runs selector (100, 500, 1000, 5000; default 1000)
+- **Data sources** – Lists GitHub, OSV, PyPI, npm, Maven Central
+- **Analysis methods** – Monte Carlo, Knapsack, PageRank
+
+#### **Tab 1: Overview Dashboard**
+
+**Key Performance Indicators (KPIs):**
+- Total Dependencies
+- Vulnerable Packages
+- Critical Risk nodes
+- High Risk nodes
+- Total CVEs found
+- Fixable packages
+
+**Visualizations:**
+
+1. **Risk Distribution (Donut Chart)**
+   - Breakdown by severity: CRITICAL, HIGH, MEDIUM, LOW, CLEAN
+   - Center circle shows total vulnerable count
+
+2. **Top 10 Riskiest Packages (Horizontal Bar Chart)**
+   - Color-coded by risk class
+   - Risk scores displayed on each bar
+   - Hover for package details
+
+3. **Ecosystem Breakdown (Cards)**
+   - 🐍 Python (PyPI) – package count + vulnerable count
+   - 📦 Node.js (npm) – package count + vulnerable count
+   - ☕ Java (Maven) – package count + vulnerable count
+
+#### **Tab 2: Interactive Dependency Graph**
+
+Features:
+- **Force-directed network visualization** using Vis.js library
+- **Node styling:**
+  - Size = PageRank (importance/centrality)
+  - Color = Risk class (CRITICAL red, HIGH orange, etc.)
+  - Root node = highlighted entry point
+- **Interactive controls:**
+  - Zoom, pan, drag to explore
+  - Click nodes for details popup
+  - Hover for package info
+- **Filters:**
+  - Show all / vulnerable only / critical only
+  - Depth range slider
+  - Search by package name
+
+#### **Tab 3: Simulation Results & Blast Radius**
+
+Displays Monte Carlo attack propagation analysis:
+
+- **Attack origin selector** – Choose which vulnerable package to trace from
+- **Simulation statistics:**
+  - Mean blast radius – Average packages compromised
+  - P95 blast radius – Worst-case scenario (95th percentile)
+  - Critical hit rate – % of runs reaching a CRITICAL node
+  - Exposure score – Overall danger metric (0–100)
+- **Node infection probabilities** – For each package, probability of compromise
+- **Visualization:**
+  - Histogram of blast radius distribution
+  - Heatmap of node infection probabilities
+  - Timeline of propagation (step-by-step spread)
+
+#### **Tab 4: Mitigation Plan & Optimization**
+
+Displays knapsack-optimized fix recommendations:
+
+- **Budget scenario selector** – Choose 8h, 16h, 24h, or 40h budget
+- **Selected fixes table:**
+  - Package name
+  - Risk class (with color badge)
+  - CVSS score
+  - Estimated fix cost (hours)
+  - Benefit score
+  - Fixed-in version
+  - Ecosystem
+
+- **Summary statistics:**
+  - Packages to fix (count)
+  - Total hours required
+  - Hours remaining
+  - Risk reduction % (of total vulnerability risk)
+
+- **Unaddressed vulnerabilities:**
+  - List of packages below the cut-off
+  - Reason: insufficient budget or no fix available
+
+#### **Tab 5: Package Details**
+
+Full data table with sortable/filterable columns:
+- Package name & version
+- Ecosystem (PyPI / npm / Maven)
+- Dependency depth
+- Direct vs transitive
+- CVSS score
+- Risk score & class
+- Vulnerability count
+- Fix availability
+- In-degree (how many depend on this)
+- PageRank (centrality)
+- Mean blast radius
+- Exposure score
+- AI-generated explanation
+
+**Features:**
+- Sort by any column
+- Search/filter by package name
+- Expandable rows for vulnerability details
+- Export to CSV
+
+#### **Styling & UX**
+
+- **Dark theme** matching GitHub's dark UI (Primer colors)
+- **Risk-based color coding:**
+  - 🔴 CRITICAL – #ff7b72 (bright red)
+  - 🟠 HIGH – #f0883e (orange)
+  - 🟡 MEDIUM – #e3b341 (yellow)
+  - 🔵 LOW – #58a6ff (blue)
+  - 🟢 CLEAN – #3fb950 (green)
+- **Responsive layout** – Adapts to desktop, tablet, mobile
+- **Streamlit components:**
+  - Progress bars for pipeline execution
+  - Spinners for long-running operations
+  - Info/error/success messages
+  - Expandable sections for detail
+
+### Running the Dashboard
+
+```bash
+streamlit run dashboard/app.py
+```
+
+Dashboard opens at `http://localhost:8501`
+
+---
+
+## **Updated Data Flow Summary**
+
+```
+GitHub Repo URL
+    ↓
+[Module 1] Ingest dependencies → packages list
+    ↓
+[Module 2] Build graph → enriched DiGraph with PageRank, centrality
+    ↓
+[Module 3] Query OSV → add CVSS, risk scores, classifications
+    ↓
+[Module 4] Simulate propagation → statistics on blast radius, exposure
+    ↓
+[Module 5] Optimize fixes → knapsack-selected mitigation plan
+    ↓
+[Module 6] Interactive Dashboard → visualizations + export
+    ↓
+Output: Risk reports, threat profiles, cascading attack scenarios, fix priorities
+```
+
+---
+
+## **Complete End-to-End Workflow**
+
+### Using the Command-Line Pipeline (main.py)
+
+```python
+from ingestion.ingestion_runner import ingest
+from graph.graph_builder import build_graph
+from risk.enricher import enrich_graph, export_enriched_graph, print_risk_report
+from simulation.simulation_runner import run_full_simulation
+from optimizer.optimizer_runner import run_optimization
+
+url = "https://github.com/pallets/flask"
+
+# Module 1: Download dependencies
+packages = ingest(url)
+
+# Module 2: Build dependency graph
+G = build_graph(packages, repo_name="pallets/flask", max_depth=3)
+
+# Module 3: Enrich with vulnerabilities
+G = enrich_graph(G)
+export_enriched_graph(G)
+print_risk_report(G)
+
+# Module 4: Simulate attacks
+results = run_full_simulation(G, n_simulations=1000)
+
+# Module 5: Optimize mitigation
+mitigation = run_optimization(G, results, budgets=[8, 16, 24, 40])
+```
+
+### Using the Interactive Dashboard
+
+1. **Start the dashboard:**
+   ```bash
+   streamlit run dashboard/app.py
+   ```
+
+2. **In the sidebar:**
+   - Paste GitHub URL (e.g., `https://github.com/pallets/flask`)
+   - Click "🚀 Run Live Analysis"
+
+3. **Monitor progress:**
+   - Dashboard shows 5 steps: Ingestion → Graph → Enrichment → Simulation → Optimization
+
+4. **Explore results in tabs:**
+   - Overview: KPIs and risk distribution
+   - Dependency Graph: Interactive visualization
+   - Simulation: Blast radius analysis
+   - Mitigation Plan: Knapsack recommendations
+   - Package Details: Full vulnerability data
+
+5. **Export or cache:**
+   - Results saved to `output/` directory
+   - Next time: Click "📂 Load Cached Results" to skip pipeline
