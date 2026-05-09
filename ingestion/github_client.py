@@ -8,10 +8,21 @@ load_dotenv()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 BASE_URL = "https://api.github.com"
 
-HEADERS = {
-    "Authorization": f"token {GITHUB_TOKEN}",
-    "Accept": "application/vnd.github.v3+json"
-}
+def _get_headers(access_token: str = None) -> dict:
+    """
+    Get headers for GitHub API requests.
+    
+    Args:
+        access_token: Optional OAuth token (takes precedence over GITHUB_TOKEN)
+    
+    Returns:
+        dict with Authorization header and API version
+    """
+    token = access_token or GITHUB_TOKEN
+    return {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
 
 TARGET_FILES = [
     "requirements.txt",
@@ -63,9 +74,21 @@ def parse_github_url(url: str) -> tuple:
     return parts[0], parts[1]
 
 
-def get_file_tree(owner: str, repo: str) -> list:
+def get_file_tree(owner: str, repo: str, access_token: str = None) -> list:
+    """
+    Get file tree of a repository.
+    
+    Args:
+        owner: Repository owner
+        repo: Repository name
+        access_token: Optional OAuth token for private repos
+    
+    Returns:
+        List of file paths in the repository
+    """
+    headers = _get_headers(access_token)
     url = f"{BASE_URL}/repos/{owner}/{repo}/git/trees/HEAD?recursive=1"
-    response = requests.get(url, headers=HEADERS)
+    response = requests.get(url, headers=headers)
 
     if response.status_code == 404:
         raise ValueError(f"Repository not found: {owner}/{repo}")
@@ -112,9 +135,22 @@ def find_dependency_files(file_paths: list) -> list:
     return found
 
 
-def get_file_content(owner: str, repo: str, path: str) -> str:
+def get_file_content(owner: str, repo: str, path: str, access_token: str = None) -> str:
+    """
+    Get file content from a repository.
+    
+    Args:
+        owner: Repository owner
+        repo: Repository name
+        path: File path within the repository
+        access_token: Optional OAuth token for private repos
+    
+    Returns:
+        File content as string
+    """
+    headers = _get_headers(access_token)
     url = f"{BASE_URL}/repos/{owner}/{repo}/contents/{path}"
-    response = requests.get(url, headers=HEADERS)
+    response = requests.get(url, headers=headers)
     response.raise_for_status()
 
     content_b64 = response.json().get("content", "")

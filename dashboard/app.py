@@ -17,9 +17,11 @@ import plotly.graph_objects as go
 import plotly.express as px
 from collections import defaultdict
 import logging
+from urllib.parse import parse_qs, urlparse
 
 from logging_config import setup_logging, get_logger
 from config import get_config
+from github_oauth import GitHubOAuthHandler, TokenStore
 
 # Setup logging
 setup_logging()
@@ -437,6 +439,89 @@ def get_theme_css(is_light: bool) -> str:
 if "theme" not in st.session_state:
     st.session_state.theme = "light"
 
+# ── OAuth state initialization ────────────────────────────────────────────────
+if "oauth_token_metadata" not in st.session_state:
+    st.session_state.oauth_token_metadata = None
+if "github_user" not in st.session_state:
+    st.session_state.github_user = None
+if "available_repos" not in st.session_state:
+    st.session_state.available_repos = []
+
+# ── Custom CSS ────────────────────────────────────────────────────────────────
+st.markdown(get_theme_css(st.session_state.theme == "light"), unsafe_allow_html=True)
+
+
+# ── OAuth callback handler ────────────────────────────────────────────────────
+def handle_oauth_callback():
+    """Handle OAuth callback from GitHub after user authorization."""
+    try:
+        query_params = st.query_params
+        
+        if "code" not in query_params:
+            return
+        
+        # Get code (handle both string and list cases)
+        code = query_params["code"]
+        if isinstance(code, list) and len(code) > 0:
+            code = code[0]
+        
+        state = query_params.get("state", "")
+        if isinstance(state, list) and len(state) > 0:
+            state = state[0]
+        
+        logger.info(f"OAuth callback received with code: {code[:20]}..., state: {state}")
+        
+        # Validate state for CSRF protection
+        if state != "cascadeguard":
+            logger.warning(f"Invalid state in OAuth callback: {state}")
+            st.error("Invalid OAuth state. Security validation failed.")
+            return
+        
+        # Exchange code for access token
+        token_data = GitHubOAuthHandler.exchange_code_for_token(code)
+        
+        if token_data and "access_token" in token_data:
+            access_token = token_data["access_token"]
+            
+            # Store token metadata
+            st.session_state.oauth_token_metadata = TokenStore.store_token(
+                access_token,
+                token_data.get("expires_in")
+            )
+            logger.info("Token successfully stored")
+            
+            # Fetch user info
+            user_info = GitHubOAuthHandler.get_user_info(access_token)
+            if user_info:
+                st.session_state.github_user = user_info
+                logger.info(f"User authenticated: {user_info.get('login')}")
+            
+            # Fetch repositories
+            repos = GitHubOAuthHandler.list_repositories(access_token)
+            st.session_state.available_repos = repos
+            logger.info(f"Loaded {len(repos)} repositories")
+            
+            # Clear query params
+            st.query_params.clear()
+            st.success("✅ Successfully signed in with GitHub!")
+            st.rerun()
+        else:
+            logger.error("Failed to exchange code for token")
+            st.error("Failed to authenticate with GitHub. Please try again.")
+    except Exception as e:
+        logger.error(f"OAuth callback error: {e}")
+        st.error(f"OAuth error: {e}")
+
+
+# Handle OAuth callback if present
+handle_oauth_callback()
+
+# ── Initialize pipeline variables (must be before sidebar) ──────────────────
+github_url = None
+access_token = None
+run_live = False
+load_cached = False
+
 # ── Custom CSS ────────────────────────────────────────────────────────────────
 st.markdown(get_theme_css(st.session_state.theme == "light"), unsafe_allow_html=True)
 
@@ -482,7 +567,7 @@ def load_json(path: str) -> dict | None:
     with open(path) as f:
         return json.load(f)
 
-def run_pipeline(github_url: str, progress_bar, status_text):
+def run_pipeline(github_url: str, progress_bar, status_text, access_token: str = None):
     from ingestion.ingestion_runner import ingest
     from ingestion.github_client import parse_github_url, get_file_tree, get_file_content
     from graph.graph_builder import build_graph
@@ -521,7 +606,7 @@ def run_pipeline(github_url: str, progress_bar, status_text):
     progress_bar.progress(60)
     try:
         owner, repo = parse_github_url(github_url)
-        file_tree = get_file_tree(owner, repo)
+        file_tree = get_file_tree(owner, repo, access_token=access_token)
         extensions = {".py", ".js", ".ts", ".jsx", ".tsx"}
         excluded_dirs = {"node_modules", "vendor", ".git", "__pycache__", ".tox", "venv", ".venv",
                         "env", "dist", "build", "target", ".gradle", "examples", "test", "tests",
@@ -533,7 +618,7 @@ def run_pipeline(github_url: str, progress_bar, status_text):
             if any(part in excluded_dirs for part in path.split("/")[:-1]):
                 continue
             try:
-                content = get_file_content(owner, repo, path)
+                content = get_file_content(owner, repo, path, access_token=access_token)
                 source_files[path] = content
             except Exception as e:
                 logger.warning(f"Failed to fetch {path}: {e}")
@@ -646,15 +731,96 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("#### Analyze Repository")
-    github_url = st.text_input(
-        "GitHub URL",
-        placeholder="https://github.com/owner/repo",
-        label_visibility="collapsed"
-    )
-
-    run_live    = st.button("🚀 Run Live Analysis")
-    load_cached = st.button("📂 Load Cached Results")
+    # ── OAuth Authentication Section ─────────────────────────────────────
+    is_light_sidebar = st.session_state.theme == "light"
+    
+    if st.session_state.oauth_token_metadata is None:
+        # Not authenticated — show signin button
+        st.markdown("#### 🔐 Sign In")
+        
+        auth_url = GitHubOAuthHandler.get_auth_url(scope="repo")
+        
+        st.markdown(f"""
+        <div style="padding: 12px; background: {'#f0f3f8' if is_light_sidebar else '#1c2128'}; 
+                    border-radius: 8px; border: 1px solid {'#e0e3e8' if is_light_sidebar else '#30363d'};
+                    font-size: 13px; color: {'#6b7280' if is_light_sidebar else '#8b949e'};
+                    line-height: 1.6; margin-bottom: 12px;">
+            Sign in with your GitHub account to access both public and private repositories.
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown(f"""
+        <a href="{auth_url}" target="_self">
+            <button style="width: 100%; padding: 10px 16px; background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%); 
+                           color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+                           box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2); transition: all 0.3s;">
+                🔗 Sign in with GitHub
+            </button>
+        </a>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+    else:
+        # Authenticated — show user info and repo selector
+        user = st.session_state.github_user or {}
+        
+        st.markdown("#### 👤 Authenticated")
+        
+        st.markdown(f"""
+        <div style="padding: 12px; background: {'#dcfce7' if is_light_sidebar else '#0d3820'}; 
+                    border-radius: 8px; border: 1px solid {'#bbf7d0' if is_light_sidebar else '#238636'};
+                    font-size: 12px; color: {'#166534' if is_light_sidebar else '#3fb950'};
+                    font-weight: 600;">
+            ✅ Signed in as <strong>{user.get('login', 'User')}</strong>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("🚪 Sign Out", use_container_width=True, key="signout_btn"):
+            st.session_state.oauth_token_metadata = None
+            st.session_state.github_user = None
+            st.session_state.available_repos = []
+            st.rerun()
+        
+        st.markdown("---")
+        st.markdown("#### 📦 Select Repository")
+        
+        if st.session_state.available_repos:
+            # Format repos for display: "repo-name (description)" or "repo-name"
+            repo_options = []
+            for repo in st.session_state.available_repos:
+                label = repo["full_name"]
+                if repo["private"]:
+                    label += " 🔒"
+                if repo["description"]:
+                    label += f" — {repo['description'][:40]}..."
+                repo_options.append({
+                    "label": label,
+                    "url": repo["html_url"],
+                    "full_name": repo["full_name"],
+                })
+            
+            selected_repo_label = st.selectbox(
+                "Choose a repository",
+                options=[r["label"] for r in repo_options],
+                label_visibility="collapsed",
+                key="repo_select"
+            )
+            
+            selected_repo = next(r for r in repo_options if r["label"] == selected_repo_label)
+            github_url = f"https://github.com/{selected_repo['full_name']}"
+            
+            # Get OAuth token for API calls
+            access_token = TokenStore.get_valid_token(st.session_state.oauth_token_metadata)
+            
+            run_live    = st.button("🚀 Run Live Analysis", use_container_width=True)
+            load_cached = st.button("📂 Load Cached Results", use_container_width=True)
+        else:
+            st.info("Loading repositories...", icon="⏳")
+            github_url = None
+            access_token = None
+            run_live = False
+            load_cached = False
 
     st.markdown("---")
     st.markdown("#### Settings")
@@ -750,7 +916,7 @@ if run_live and github_url:
         progress_bar = st.progress(0)
         status_text  = st.empty()
         G, results, impact_map, narratives, scan_results = run_pipeline(
-            github_url, progress_bar, status_text
+            github_url, progress_bar, status_text, access_token=access_token
         )
         st.session_state.G              = G
         st.session_state.sim_results    = results
@@ -790,55 +956,120 @@ if st.session_state.G is None:
     is_light = st.session_state.theme == "light"
     RISK_COLORS = get_risk_colors(is_light)
 
-    st.markdown(f"""
-    <div style="text-align:center; padding: 80px 0 40px 0;">
-        <div style="font-size:64px;">🛡️</div>
-        <div style="font-size:36px; font-weight:700; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:16px;">
-            CascadeGuard
+    if st.session_state.oauth_token_metadata is None:
+        # Not authenticated - show signin prompt
+        st.markdown(f"""
+        <div style="text-align:center; padding: 80px 0 40px 0;">
+            <div style="font-size:64px;">🛡️</div>
+            <div style="font-size:36px; font-weight:700; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:16px;">
+                CascadeGuard
+            </div>
+            <div style="font-size:18px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:8px;">
+                Zero-Trust Software Supply Chain Risk Intelligence
+            </div>
+            <div style="font-size:14px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:24px; max-width:560px;
+                        margin-left:auto; margin-right:auto; line-height:1.8;">
+                Sign in with your GitHub account to analyze both public and private repositories.
+                Get comprehensive dependency graphs, vulnerability detection, and risk mitigation strategies.
+            </div>
+            <div style="margin-top:32px;">
+        """, unsafe_allow_html=True)
+        
+        auth_url = GitHubOAuthHandler.get_auth_url(scope="repo")
+        st.markdown(f"""
+        <a href="{auth_url}" target="_self" style="text-decoration: none;">
+            <button style="padding: 14px 32px; background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%); 
+                           color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
+                           font-size: 16px; box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3); 
+                           transition: all 0.3s; hover:box-shadow: 0 6px 16px rgba(0, 102, 204, 0.4%);">
+                🔗 Sign in with GitHub
+            </button>
+        </a>
         </div>
-        <div style="font-size:18px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:8px;">
-            Zero-Trust Software Supply Chain Risk Intelligence
+        """, unsafe_allow_html=True)
+        
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.markdown(f"""
+            <div class="info-card">
+                <div style="font-size:28px;">🕸️</div>
+                <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">Graph Analysis</div>
+                <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
+                    Builds a full dependency graph up to 3 levels deep across PyPI, npm, and Maven ecosystems.
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        with c2:
+            st.markdown(f"""
+            <div class="info-card">
+                <div style="font-size:28px;">🎲</div>
+                <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">Monte Carlo Simulation</div>
+                <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
+                    Runs 1000 attack propagation simulations per vulnerable node to estimate real-world blast radius probabilities.
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        with c3:
+            st.markdown(f"""
+            <div class="info-card">
+                <div style="font-size:28px;">⚡</div>
+                <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">Smart Prioritization</div>
+                <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
+                    Knapsack optimization selects the highest-value fixes within your engineering budget — not just highest CVSS.
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        # Authenticated but no analysis yet
+        st.markdown(f"""
+        <div style="text-align:center; padding: 80px 0 40px 0;">
+            <div style="font-size:64px;">🛡️</div>
+            <div style="font-size:36px; font-weight:700; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:16px;">
+                CascadeGuard
+            </div>
+            <div style="font-size:18px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:8px;">
+                Zero-Trust Software Supply Chain Risk Intelligence
+            </div>
+            <div style="font-size:14px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:24px; max-width:560px;
+                        margin-left:auto; margin-right:auto; line-height:1.8;">
+                Select a repository in the sidebar and click "Run Live Analysis" to get started.
+            </div>
         </div>
-        <div style="font-size:14px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:24px; max-width:560px;
-                    margin-left:auto; margin-right:auto; line-height:1.8;">
-            Enter a GitHub repository URL in the sidebar to analyze its full
-            dependency graph, detect vulnerabilities, simulate attack propagation,
-            and generate an optimized mitigation plan.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        st.markdown(f"""
-        <div class="info-card">
-            <div style="font-size:28px;">🕸️</div>
-            <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">Graph Analysis</div>
-            <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
-                Builds a full dependency graph up to 3 levels deep across PyPI, npm, and Maven ecosystems.
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.markdown(f"""
+            <div class="info-card">
+                <div style="font-size:28px;">🕸️</div>
+                <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">Graph Analysis</div>
+                <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
+                    Builds a full dependency graph up to 3 levels deep across PyPI, npm, and Maven ecosystems.
+                </div>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
-    with c2:
-        st.markdown(f"""
-        <div class="info-card">
-            <div style="font-size:28px;">🎲</div>
-            <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">Monte Carlo Simulation</div>
-            <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
-                Runs 1000 attack propagation simulations per vulnerable node to estimate real-world blast radius probabilities.
+            """, unsafe_allow_html=True)
+        with c2:
+            st.markdown(f"""
+            <div class="info-card">
+                <div style="font-size:28px;">🎲</div>
+                <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">Monte Carlo Simulation</div>
+                <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
+                    Runs 1000 attack propagation simulations per vulnerable node to estimate real-world blast radius probabilities.
+                </div>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
-    with c3:
-        st.markdown(f"""
-        <div class="info-card">
-            <div style="font-size:28px;">⚡</div>
-            <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">Smart Prioritization</div>
-            <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
-                Knapsack optimization selects the highest-value fixes within your engineering budget — not just highest CVSS.
+            """, unsafe_allow_html=True)
+        with c3:
+            st.markdown(f"""
+            <div class="info-card">
+                <div style="font-size:28px;">⚡</div>
+                <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">Smart Prioritization</div>
+                <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
+                    Knapsack optimization selects the highest-value fixes within your engineering budget — not just highest CVSS.
+                </div>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
     st.stop()
 
 
