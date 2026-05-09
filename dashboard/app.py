@@ -11,6 +11,7 @@ import streamlit as st
 import networkx as nx
 from networkx.readwrite import json_graph
 import json
+import datetime
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
@@ -249,6 +250,16 @@ def get_theme_css(is_light: bool) -> str:
                 border: 1.5px solid #e0e3e8;
                 border-radius: 10px;
             }
+
+            /* Download button distinct style */
+            [data-testid="stDownloadButton"] > button {
+                background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+                box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25) !important;
+            }
+            [data-testid="stDownloadButton"] > button:hover {
+                background: linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
+                box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35) !important;
+            }
         </style>
         """
     else:
@@ -409,12 +420,22 @@ def get_theme_css(is_light: bool) -> str:
 
             /* Slider */
             .stSlider > div > div > div { background: #238636; }
+
+            /* Download button distinct style */
+            [data-testid="stDownloadButton"] > button {
+                background: #1a7f37 !important;
+                border: 1px solid #2ea043 !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+            }
+            [data-testid="stDownloadButton"] > button:hover {
+                background: #2ea043 !important;
+            }
         </style>
         """
 
 # ── Theme state initialization ────────────────────────────────────────────────
 if "theme" not in st.session_state:
-    st.session_state.theme = "light"  # Default to light mode
+    st.session_state.theme = "light"
 
 # ── Custom CSS ────────────────────────────────────────────────────────────────
 st.markdown(get_theme_css(st.session_state.theme == "light"), unsafe_allow_html=True)
@@ -423,7 +444,6 @@ st.markdown(get_theme_css(st.session_state.theme == "light"), unsafe_allow_html=
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def get_risk_colors(is_light: bool) -> dict:
-    """Return risk colors based on theme."""
     if is_light:
         return {
             "CRITICAL": "#dc2626",
@@ -463,7 +483,6 @@ def load_json(path: str) -> dict | None:
         return json.load(f)
 
 def run_pipeline(github_url: str, progress_bar, status_text):
-    """Runs the full CascadeGuard pipeline including new attack classification and impact analysis."""
     from ingestion.ingestion_runner import ingest
     from ingestion.github_client import parse_github_url, get_file_tree, get_file_content
     from graph.graph_builder import build_graph
@@ -503,13 +522,10 @@ def run_pipeline(github_url: str, progress_bar, status_text):
     try:
         owner, repo = parse_github_url(github_url)
         file_tree = get_file_tree(owner, repo)
-        
-        # Filter for source files
         extensions = {".py", ".js", ".ts", ".jsx", ".tsx"}
         excluded_dirs = {"node_modules", "vendor", ".git", "__pycache__", ".tox", "venv", ".venv",
                         "env", "dist", "build", "target", ".gradle", "examples", "test", "tests",
                         "fixtures", "docs", "doc", ".github", "site", "benchmark", "benchmarks"}
-        
         source_files = {}
         for path in file_tree:
             if not any(path.endswith(ext) for ext in extensions):
@@ -535,8 +551,6 @@ def run_pipeline(github_url: str, progress_bar, status_text):
     status_text.text("🎯 Step 7/8 — Mapping vulnerability impact to source files...")
     progress_bar.progress(80)
     impact_map = map_impact(G, scan_results)
-    
-    # Attach impact data to nodes (keys in impact_map are node IDs matching graph nodes)
     for impact_node_id, impact_data in impact_map.items():
         if impact_node_id in G.nodes():
             G.nodes[impact_node_id]["impact_data"] = impact_data
@@ -547,8 +561,8 @@ def run_pipeline(github_url: str, progress_bar, status_text):
     for node, data in G.nodes(data=True):
         if data.get("ecosystem") != "root" and data.get("risk_class") in ["CRITICAL", "HIGH"]:
             try:
-                narrative = generate_full_narrative(node, data, impact_map, 
-                                                   data.get("risk_score", 0), 
+                narrative = generate_full_narrative(node, data, impact_map,
+                                                   data.get("risk_score", 0),
                                                    data.get("risk_class", ""))
                 narratives.append(narrative)
                 G.nodes[node]["narrative"] = narrative
@@ -562,11 +576,9 @@ def run_pipeline(github_url: str, progress_bar, status_text):
 
     progress_bar.progress(100)
     status_text.text("✅ Analysis complete.")
-
     return G, results, impact_map, narratives, scan_results
 
 def get_node_df(G: nx.DiGraph) -> pd.DataFrame:
-    """Converts graph nodes to a clean DataFrame for display."""
     rows = []
     for node, data in G.nodes(data=True):
         if data.get("ecosystem") == "root":
@@ -591,6 +603,22 @@ def get_node_df(G: nx.DiGraph) -> pd.DataFrame:
     return pd.DataFrame(rows).sort_values("risk_score", ascending=False)
 
 
+# ── Report generation helper ──────────────────────────────────────────────────
+
+def _build_report_bytes(repo_name: str) -> bytes:
+    """Generate the Excel report and return raw bytes."""
+    from report_generator import generate_report
+    plan_data = load_json("output/mitigation_plan.json")
+    return generate_report(
+        G         = st.session_state.G,
+        results   = st.session_state.sim_results or {},
+        df        = get_node_df(st.session_state.G),
+        plan_data = plan_data,
+        impact_map= st.session_state.impact_map or {},
+        repo_name = repo_name,
+    )
+
+
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 
 with st.sidebar:
@@ -604,15 +632,15 @@ with st.sidebar:
         if st.button("🌙 Dark", key="dark_btn", use_container_width=True):
             st.session_state.theme = "dark"
             st.rerun()
-    
+
     st.markdown("---")
-    
+
     st.markdown("""
     <div style="padding: 8px 0 24px 0;">
-        <div style="font-size:24px; font-weight:700; {% if is_light %}color:#1a1f3a;{% else %}color:#e6edf3;{% endif %}">
+        <div style="font-size:24px; font-weight:700;">
             🛡️ CascadeGuard
         </div>
-        <div style="font-size:12px; {% if is_light %}color:#6b7280;{% else %}color:#8b949e;{% endif %} margin-top:4px;">
+        <div style="font-size:12px; margin-top:4px; opacity:0.6;">
             Supply Chain Risk Intelligence
         </div>
     </div>
@@ -625,7 +653,7 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
-    run_live  = st.button("🚀 Run Live Analysis")
+    run_live    = st.button("🚀 Run Live Analysis")
     load_cached = st.button("📂 Load Cached Results")
 
     st.markdown("---")
@@ -638,18 +666,65 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    st.markdown("""
-    <div style="font-size:11px; {% if is_light %}color:#6b7280;{% else %}color:#8b949e;{% endif %} line-height:1.6;">
-        <b style="{% if is_light %}color:#1a1f3a;{% else %}color:#e6edf3;{% endif %}">Data sources</b><br>
+    is_light_sidebar = st.session_state.theme == "light"
+    st.markdown(f"""
+    <div style="font-size:11px; color:{'#6b7280' if is_light_sidebar else '#8b949e'}; line-height:1.6;">
+        <b style="color:{'#1a1f3a' if is_light_sidebar else '#e6edf3'};">Data sources</b><br>
         GitHub REST API<br>
         OSV Vulnerability DB<br>
         PyPI · npm · Maven Central<br><br>
-        <b style="{% if is_light %}color:#1a1f3a;{% else %}color:#e6edf3;{% endif %}">Analysis</b><br>
+        <b style="color:{'#1a1f3a' if is_light_sidebar else '#e6edf3'};">Analysis</b><br>
         Monte Carlo Simulation<br>
         0/1 Knapsack Optimization<br>
         PageRank Centrality
     </div>
     """, unsafe_allow_html=True)
+
+    # ── ✨ PATCH A: Report download button ────────────────────────────────
+    st.markdown("---")
+    st.markdown("#### 📥 Download Report")
+
+    if st.session_state.get("G") is not None:
+        repo_label = st.session_state.get("repo_name", "repo") or "repo"
+        safe_name  = repo_label.replace("/", "_").replace(" ", "_")
+        today_str  = datetime.date.today().isoformat()
+
+        try:
+            report_bytes = _build_report_bytes(repo_label)
+            st.download_button(
+                label     = "⬇️  Download Full Report (.xlsx)",
+                data      = report_bytes,
+                file_name = f"cascadeguard_{safe_name}_{today_str}.xlsx",
+                mime      = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True,
+                help      = (
+                    "7-sheet Excel workbook:\n"
+                    "• Executive Summary\n"
+                    "• All Packages\n"
+                    "• Critical & High Risk detail\n"
+                    "• Full CVE listing\n"
+                    "• Simulation results\n"
+                    "• Mitigation plan\n"
+                    "• Module impact"
+                ),
+            )
+            st.markdown(
+                f"<div style='font-size:11px; color:{'#6b7280' if is_light_sidebar else '#8b949e'};"
+                f" margin-top:4px; line-height:1.5;'>"
+                f"7 sheets · packages, CVEs,<br>simulation & mitigation data"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+        except Exception as e:
+            st.error(f"Report error: {e}")
+    else:
+        st.markdown(
+            f"<div style='font-size:12px; color:{'#6b7280' if is_light_sidebar else '#8b949e'};'>"
+            "Run an analysis to enable download."
+            "</div>",
+            unsafe_allow_html=True,
+        )
+    # ─────────────────────────────────────────────────────────────────────
 
 
 # ── Session state ─────────────────────────────────────────────────────────────
@@ -674,7 +749,9 @@ if run_live and github_url:
     with st.spinner(""):
         progress_bar = st.progress(0)
         status_text  = st.empty()
-        G, results, impact_map, narratives, scan_results = run_pipeline(github_url, progress_bar, status_text)
+        G, results, impact_map, narratives, scan_results = run_pipeline(
+            github_url, progress_bar, status_text
+        )
         st.session_state.G              = G
         st.session_state.sim_results    = results
         st.session_state.repo_name      = github_url.split("github.com/")[-1].rstrip("/")
@@ -692,21 +769,16 @@ elif load_cached:
             k: v for k, v in results.items() if k != "__summary__"
         }
         st.session_state.repo_name   = "cached results"
-        
-        # Reconstruct impact_map from graph nodes
         impact_map = {}
         for node, data in G.nodes(data=True):
             if data.get("impact_data"):
                 impact_map[node] = data.get("impact_data")
         st.session_state.impact_map = impact_map
-        
-        # Reconstruct narratives from graph nodes
         narratives = []
         for node, data in G.nodes(data=True):
             if data.get("narrative") and data.get("risk_class") in ["CRITICAL", "HIGH"]:
                 narratives.append(data.get("narrative"))
         st.session_state.narratives = narratives
-        
         st.success("Loaded cached results.")
     else:
         st.error("No cached results found. Run a live analysis first.")
@@ -717,7 +789,7 @@ elif load_cached:
 if st.session_state.G is None:
     is_light = st.session_state.theme == "light"
     RISK_COLORS = get_risk_colors(is_light)
-    
+
     st.markdown(f"""
     <div style="text-align:center; padding: 80px 0 40px 0;">
         <div style="font-size:64px;">🛡️</div>
@@ -741,12 +813,9 @@ if st.session_state.G is None:
         st.markdown(f"""
         <div class="info-card">
             <div style="font-size:28px;">🕸️</div>
-            <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">
-                Graph Analysis
-            </div>
+            <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">Graph Analysis</div>
             <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
-                Builds a full dependency graph up to 3 levels deep across
-                PyPI, npm, and Maven ecosystems.
+                Builds a full dependency graph up to 3 levels deep across PyPI, npm, and Maven ecosystems.
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -754,12 +823,9 @@ if st.session_state.G is None:
         st.markdown(f"""
         <div class="info-card">
             <div style="font-size:28px;">🎲</div>
-            <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">
-                Monte Carlo Simulation
-            </div>
+            <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">Monte Carlo Simulation</div>
             <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
-                Runs 1000 attack propagation simulations per vulnerable node
-                to estimate real-world blast radius probabilities.
+                Runs 1000 attack propagation simulations per vulnerable node to estimate real-world blast radius probabilities.
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -767,12 +833,9 @@ if st.session_state.G is None:
         st.markdown(f"""
         <div class="info-card">
             <div style="font-size:28px;">⚡</div>
-            <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">
-                Smart Prioritization
-            </div>
+            <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">Smart Prioritization</div>
             <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
-                Knapsack optimization selects the highest-value fixes within
-                your engineering budget — not just highest CVSS.
+                Knapsack optimization selects the highest-value fixes within your engineering budget — not just highest CVSS.
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -781,7 +844,6 @@ if st.session_state.G is None:
 
 # ── Main dashboard ────────────────────────────────────────────────────────────
 
-# Update risk colors based on current theme
 is_light = st.session_state.theme == "light"
 RISK_COLORS = get_risk_colors(is_light)
 
@@ -815,7 +877,7 @@ fixable        = len(df[(df["cvss_score"] > 0) & (df["fix_available"] == True)])
 k1, k2, k3, k4, k5, k6 = st.columns(6)
 k1.metric("Total Dependencies", total_nodes)
 k2.metric("Vulnerable Packages", vulnerable)
-k3.metric("Critical Risk",       critical_nodes, delta=None)
+k3.metric("Critical Risk",       critical_nodes)
 k4.metric("High Risk",           high_nodes)
 k5.metric("Total CVEs",          total_vulns)
 k6.metric("Fixable Now",         fixable)
@@ -925,7 +987,7 @@ with tab1:
                 unsafe_allow_html=True)
     eco_cols = st.columns(3)
     for i, eco in enumerate(["pypi", "npm", "maven"]):
-        eco_df = df[df["ecosystem"] == eco]
+        eco_df   = df[df["ecosystem"] == eco]
         vuln_eco = len(eco_df[eco_df["cvss_score"] > 0])
         with eco_cols[i]:
             label = {"pypi": "🐍 Python (PyPI)",
@@ -935,23 +997,98 @@ with tab1:
             <div class="info-card">
                 <div style="font-size:15px; font-weight:600;
                             color:{'#1a1f3a' if is_light else '#e6edf3'};">{label}</div>
-                <div style="margin-top:12px; display:flex;
-                            justify-content:space-between;">
+                <div style="margin-top:12px; display:flex; justify-content:space-between;">
                     <div>
                         <div style="font-size:24px; font-weight:700;
                                     color:{'#1a1f3a' if is_light else '#e6edf3'};">{len(eco_df)}</div>
-                        <div style="font-size:12px;
-                                    color:{'#6b7280' if is_light else '#8b949e'};">packages</div>
+                        <div style="font-size:12px; color:{'#6b7280' if is_light else '#8b949e'};">packages</div>
                     </div>
                     <div>
                         <div style="font-size:24px; font-weight:700;
                                     color:{'#dc2626' if is_light else '#ff7b72'};">{vuln_eco}</div>
-                        <div style="font-size:12px;
-                                    color:{'#6b7280' if is_light else '#8b949e'};">vulnerable</div>
+                        <div style="font-size:12px; color:{'#6b7280' if is_light else '#8b949e'};">vulnerable</div>
                     </div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
+
+    # ── ✨ PATCH B: Top-10 risk table ─────────────────────────────────────
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(
+        '<div class="section-header">Top 10 Riskiest Packages — Detail</div>',
+        unsafe_allow_html=True,
+    )
+
+    top10_tbl = df[df["risk_score"] > 0].head(10).copy()
+
+    if not top10_tbl.empty:
+        display_cols = [
+            "package", "ecosystem", "risk_class", "risk_score",
+            "cvss_score", "vuln_count", "mean_blast_radius",
+            "exposure_score", "in_degree", "fix_available", "pagerank",
+        ]
+        display_cols = [c for c in display_cols if c in top10_tbl.columns]
+        top10_display = top10_tbl[display_cols].reset_index(drop=True)
+        top10_display.insert(0, "#", range(1, len(top10_display) + 1))
+
+        col_cfg = {
+            "#": st.column_config.NumberColumn("#", width="small", format="%d"),
+            "package": st.column_config.TextColumn(
+                "Package", width="large",
+                help="Full package identifier (ecosystem:name:version)",
+            ),
+            "ecosystem": st.column_config.TextColumn("Ecosystem", width="small"),
+            "risk_class": st.column_config.TextColumn("Risk", width="small"),
+            "risk_score": st.column_config.ProgressColumn(
+                "Risk Score", min_value=0, max_value=100, format="%.1f", width="medium",
+            ),
+            "cvss_score": st.column_config.ProgressColumn(
+                "CVSS", min_value=0, max_value=10, format="%.1f", width="small",
+            ),
+            "vuln_count": st.column_config.NumberColumn(
+                "CVEs", width="small", format="%d",
+            ),
+            "mean_blast_radius": st.column_config.NumberColumn(
+                "Blast Radius", format="%.1f", width="medium",
+                help="Mean nodes affected across 1000 simulations",
+            ),
+            "exposure_score": st.column_config.NumberColumn(
+                "Exposure", format="%.1f", width="small",
+            ),
+            "in_degree": st.column_config.NumberColumn(
+                "Dependents", width="small", format="%d",
+                help="Packages depending on this one",
+            ),
+            "fix_available": st.column_config.CheckboxColumn(
+                "Fix?", width="small",
+            ),
+            "pagerank": st.column_config.NumberColumn(
+                "PageRank", format="%.5f", width="small",
+            ),
+        }
+
+        st.dataframe(
+            top10_display,
+            column_config=col_cfg,
+            use_container_width=True,
+            hide_index=True,
+            height=420,
+        )
+
+        # Inline CSV export for the table
+        csv_col, _ = st.columns([1, 3])
+        with csv_col:
+            csv_bytes = top10_display.to_csv(index=False).encode()
+            st.download_button(
+                label     = "⬇️  Export table as CSV",
+                data      = csv_bytes,
+                file_name = f"cascadeguard_top10_{datetime.date.today()}.csv",
+                mime      = "text/csv",
+                use_container_width=True,
+            )
+    else:
+        st.info("No risk data available yet.")
+    # ─────────────────────────────────────────────────────────────────────
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -967,25 +1104,20 @@ with tab2:
 
         net = Network(
             height="600px", width="100%",
-            bgcolor='#f8f9fa' if is_light else '#0d1117', 
+            bgcolor='#f8f9fa' if is_light else '#0d1117',
             font_color='#1a1f3a' if is_light else '#e6edf3',
             directed=True
         )
-        net.barnes_hut(
-            gravity=-8000,
-            central_gravity=0.3,
-            spring_length=120,
-            spring_strength=0.05
-        )
+        net.barnes_hut(gravity=-8000, central_gravity=0.3,
+                       spring_length=120, spring_strength=0.05)
 
         for node, data in G.nodes(data=True):
-            eco      = data.get("ecosystem", "root")
-            rc       = data.get("risk_class", "CLEAN")
-            rs       = data.get("risk_score", 0.0)
-            label    = node.split(":")[-1] if ":" in node else node
-            color    = RISK_COLORS.get(rc, "#8b949e")
-            size     = 10 + data.get("pagerank", 0) * 800
-            size     = max(8, min(size, 40))
+            eco   = data.get("ecosystem", "root")
+            rc    = data.get("risk_class", "CLEAN")
+            rs    = data.get("risk_score", 0.0)
+            label = node.split(":")[-1] if ":" in node else node
+            color = RISK_COLORS.get(rc, "#8b949e")
+            size  = max(8, min(10 + data.get("pagerank", 0) * 800, 40))
             title = (
                 f"Package: {node}\n"
                 f"Version: {data.get('version','—')}\n"
@@ -997,14 +1129,13 @@ with tab2:
             if eco == "root":
                 color = "#58a6ff"
                 size  = 30
-            net.add_node(
-                node, label=label,
-                color=color, size=size,
-                title=title, font={"size": 11}
-            )
+            net.add_node(node, label=label, color=color, size=size,
+                         title=title, font={"size": 11})
 
         for src, tgt in G.edges():
-            net.add_edge(src, tgt, color='#e0e3e8' if is_light else '#30363d', arrows="to", width=0.8)
+            net.add_edge(src, tgt,
+                         color='#e0e3e8' if is_light else '#30363d',
+                         arrows="to", width=0.8)
 
         os.makedirs("output", exist_ok=True)
         net.save_graph("output/graph_vis.html")
@@ -1014,23 +1145,22 @@ with tab2:
 
     except ImportError:
         st.warning("Install pyvis for interactive graph: `pip install pyvis`")
-        # Fallback: static plotly graph
         pos = nx.spring_layout(G, seed=42)
         edge_x, edge_y = [], []
         for src, tgt in G.edges():
-            x0,y0 = pos[src]; x1,y1 = pos[tgt]
-            edge_x += [x0,x1,None]; edge_y += [y0,y1,None]
-
+            x0, y0 = pos[src]; x1, y1 = pos[tgt]
+            edge_x += [x0, x1, None]; edge_y += [y0, y1, None]
         node_x = [pos[n][0] for n in G.nodes()]
         node_y = [pos[n][1] for n in G.nodes()]
         node_colors = [
-            RISK_COLORS.get(G.nodes[n].get("risk_class","CLEAN"), "#8b949e")
+            RISK_COLORS.get(G.nodes[n].get("risk_class", "CLEAN"), "#8b949e")
             for n in G.nodes()
         ]
         fig_g = go.Figure()
         fig_g.add_trace(go.Scatter(
             x=edge_x, y=edge_y, mode="lines",
-            line=dict(color='#e0e3e8' if is_light else '#30363d', width=0.8), hoverinfo="none"
+            line=dict(color='#e0e3e8' if is_light else '#30363d', width=0.8),
+            hoverinfo="none"
         ))
         fig_g.add_trace(go.Scatter(
             x=node_x, y=node_y, mode="markers+text",
@@ -1048,7 +1178,6 @@ with tab2:
         )
         st.plotly_chart(fig_g, use_container_width=True)
 
-    # Legend
     st.markdown("""
     <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:12px;">
         <span class="badge-critical">● CRITICAL</span>
@@ -1084,21 +1213,17 @@ with tab3:
     if not sim_data:
         st.info("No simulation data available.")
     else:
-        sim_df = pd.DataFrame(sim_data).sort_values(
-            "exposure_score", ascending=False
-        )
+        sim_df = pd.DataFrame(sim_data).sort_values("exposure_score", ascending=False)
 
-        # ── Origin node selector ──────────────────────────────────────────
         st.markdown("### 🎯 Blast Radius Animator")
         st.markdown(
             f"<div style='color:{'#1a1f3a' if is_light else '#8b949e'}; font-size:13px; margin-bottom:16px;'>"
-            "Select an attack origin to animate how compromise spreads "
-            "through the dependency graph in real time."
+            "Select an attack origin to animate how compromise spreads through the dependency graph."
             "</div>",
             unsafe_allow_html=True
         )
 
-        origin_options = sim_df["package"].tolist()
+        origin_options  = sim_df["package"].tolist()
         selected_origin = st.selectbox(
             "Attack origin node",
             origin_options,
@@ -1107,85 +1232,59 @@ with tab3:
                                   f"{G.nodes[x].get('risk_class','—')})"
         )
 
-        # ── Build animated graph ──────────────────────────────────────────
         if selected_origin:
             from simulation.propagation import run_single_simulation
 
             sim_result = run_single_simulation(G, selected_origin, seed=42)
             path       = sim_result["propagation_path"]
 
-            # ── KEY CHANGE: only show relevant subgraph ───────────────────
-            # Include: origin + all nodes reachable from origin (descendants)
-            # + direct predecessors of origin (what depends on it)
-            # + nodes in propagation path
-            # This keeps the graph focused and readable
-
             relevant_nodes = set(path)
-
-            # Add 2-hop neighborhood of origin
             for neighbor in list(G.predecessors(selected_origin)):
                 relevant_nodes.add(neighbor)
                 for n2 in G.predecessors(neighbor):
                     relevant_nodes.add(n2)
-
             for neighbor in list(G.successors(selected_origin)):
                 relevant_nodes.add(neighbor)
                 for n2 in G.successors(neighbor):
                     relevant_nodes.add(n2)
-
-            # Always include root node
             for node, data in G.nodes(data=True):
                 if data.get("ecosystem") == "root":
                     relevant_nodes.add(node)
 
-            # Cap at 60 nodes for readability
             if len(relevant_nodes) > 60:
-                # Prioritize: path nodes first, then by risk score
-                path_set  = set(path)
-                others    = sorted(
+                path_set = set(path)
+                others   = sorted(
                     relevant_nodes - path_set,
                     key=lambda n: G.nodes[n].get("risk_score", 0),
                     reverse=True
                 )
                 relevant_nodes = path_set | set(others[:60 - len(path_set)])
 
-            sub_G      = G.subgraph(relevant_nodes).copy()
-            sub_nodes  = list(sub_G.nodes())
-            pos        = nx.spring_layout(sub_G, seed=42, k=3.0)
+            sub_G     = G.subgraph(relevant_nodes).copy()
+            sub_nodes = list(sub_G.nodes())
+            pos       = nx.spring_layout(sub_G, seed=42, k=3.0)
 
             node_x = [pos[n][0] for n in sub_nodes]
             node_y = [pos[n][1] for n in sub_nodes]
 
             def get_node_color(n, revealed_set, origin):
-                if n == origin:         return "#ff4444"
+                if n == origin:       return "#ff4444"
                 if n in revealed_set:
                     rc = G.nodes[n].get("risk_class", "CLEAN")
                     return RISK_COLORS.get(rc, "#ff7b72")
                 eco = G.nodes[n].get("ecosystem", "")
-                if eco == "root":       return "#58a6ff"
+                if eco == "root":     return "#58a6ff"
                 return "#b0b8c1" if is_light else "#21262d"
 
             def get_node_size(n, revealed_set):
                 base = 12 + G.nodes[n].get("pagerank", 0) * 800
-                if n in revealed_set:   return min(base * 1.8, 45)
+                if n in revealed_set: return min(base * 1.8, 45)
                 return max(base, 10)
 
-            # Static edges
             edge_x, edge_y = [], []
             for src, tgt in sub_G.edges():
-                x0, y0 = pos[src]
-                x1, y1 = pos[tgt]
-                edge_x += [x0, x1, None]
-                edge_y += [y0, y1, None]
-
-            # Highlight edges IN the propagation path
-            attack_edge_x, attack_edge_y = [], []
-            for i in range(len(path) - 1):
-                if path[i] in pos and path[i+1] in pos:
-                    x0, y0 = pos[path[i]]
-                    x1, y1 = pos[path[i+1]]
-                    attack_edge_x += [x0, x1, None]
-                    attack_edge_y += [y0, y1, None]
+                x0, y0 = pos[src]; x1, y1 = pos[tgt]
+                edge_x += [x0, x1, None]; edge_y += [y0, y1, None]
 
             edge_trace = go.Scatter(
                 x=edge_x, y=edge_y, mode="lines",
@@ -1193,8 +1292,7 @@ with tab3:
                 hoverinfo="none", showlegend=False
             )
 
-            # Build frames
-            frames  = []
+            frames   = []
             revealed = set()
 
             for step_idx, node_at_step in enumerate(path):
@@ -1202,29 +1300,22 @@ with tab3:
                     continue
                 revealed.add(node_at_step)
 
-                # Attack edge up to this step
                 atk_x, atk_y = [], []
                 for i in range(min(step_idx, len(path) - 1)):
                     if path[i] in pos and path[i+1] in pos:
-                        x0,y0 = pos[path[i]]
-                        x1,y1 = pos[path[i+1]]
-                        atk_x += [x0, x1, None]
-                        atk_y += [y0, y1, None]
+                        x0, y0 = pos[path[i]]; x1, y1 = pos[path[i+1]]
+                        atk_x += [x0, x1, None]; atk_y += [y0, y1, None]
 
                 atk_edge_trace = go.Scatter(
                     x=atk_x, y=atk_y, mode="lines",
-                    line=dict(color="#ff4444", width=2.5,
-                              dash="dot"),
+                    line=dict(color="#ff4444", width=2.5, dash="dot"),
                     hoverinfo="none", showlegend=False
                 )
 
-                colors    = [get_node_color(n, revealed, selected_origin)
-                             for n in sub_nodes]
+                colors    = [get_node_color(n, revealed, selected_origin) for n in sub_nodes]
                 sizes     = [get_node_size(n, revealed) for n in sub_nodes]
-                opacities = [1.0 if n in revealed else 0.3
-                             for n in sub_nodes]
-                labels    = [n.split(":")[-1] if ":" in n else n
-                             for n in sub_nodes]
+                opacities = [1.0 if n in revealed else 0.3 for n in sub_nodes]
+                labels    = [n.split(":")[-1] if ":" in n else n for n in sub_nodes]
                 hover_texts = [
                     f"{n}\nRisk: {G.nodes[n].get('risk_class','—')}"
                     f"\nCVSS: {G.nodes[n].get('cvss_score',0):.1f}"
@@ -1233,86 +1324,60 @@ with tab3:
                 ]
 
                 node_trace = go.Scatter(
-                    x=node_x, y=node_y,
-                    mode="markers+text",
+                    x=node_x, y=node_y, mode="markers+text",
                     marker=dict(
-                        color=colors, size=sizes,
-                        opacity=opacities,
+                        color=colors, size=sizes, opacity=opacities,
                         line=dict(
                             color=["#ff4444" if n == selected_origin
-                                   else "#ff7b72" if n in revealed
-                                   else "#30363d"
+                                   else "#ff7b72" if n in revealed else "#30363d"
                                    for n in sub_nodes],
-                            width=[3 if n in revealed else 0.5
-                                   for n in sub_nodes]
+                            width=[3 if n in revealed else 0.5 for n in sub_nodes]
                         )
                     ),
-                    text=labels,
-                    textposition="top center",
+                    text=labels, textposition="top center",
                     textfont=dict(
-                        color=["#ff7b72" if n in revealed
-                               else "#555" for n in sub_nodes],
-                        size=[11 if n in revealed else 9
-                              for n in sub_nodes]
+                        color=["#ff7b72" if n in revealed else "#555" for n in sub_nodes],
+                        size=[11 if n in revealed else 9 for n in sub_nodes]
                     ),
-                    hovertext=hover_texts,
-                    hoverinfo="text",
-                    showlegend=False
+                    hovertext=hover_texts, hoverinfo="text", showlegend=False
                 )
 
                 frames.append(go.Frame(
                     data=[edge_trace, atk_edge_trace, node_trace],
                     name=str(step_idx),
                     layout=go.Layout(annotations=[dict(
-                        x=0.01, y=0.99,
-                        xref="paper", yref="paper",
-                        text=(
-                            f"<b>Step {step_idx + 1}/{len(path)}</b>  "
-                            f"Compromised: {len(revealed)} node(s)  "
-                            f"Latest: {node_at_step.split(':')[-1]}"
-                        ),
+                        x=0.01, y=0.99, xref="paper", yref="paper",
+                        text=(f"<b>Step {step_idx+1}/{len(path)}</b>  "
+                              f"Compromised: {len(revealed)} node(s)  "
+                              f"Latest: {node_at_step.split(':')[-1]}"),
                         showarrow=False,
-                        bgcolor="#161b22",
-                        bordercolor="#ff4444",
-                        borderwidth=1,
-                        borderpad=10,
+                        bgcolor="#161b22", bordercolor="#ff4444",
+                        borderwidth=1, borderpad=10,
                         font=dict(color="#e6edf3", size=13),
-                        align="left",
-                        xanchor="left", yanchor="top"
+                        align="left", xanchor="left", yanchor="top"
                     )])
                 ))
 
             if not frames:
-                st.info("This node had no propagation in the seed simulation. "
-                        "Try a different origin or check simulation results.")
+                st.info("This node had no propagation in the seed simulation. Try a different origin.")
             else:
-                # Initial state
-                init_colors = [get_node_color(n, {selected_origin},
-                                              selected_origin)
-                               for n in sub_nodes]
-                init_sizes  = [get_node_size(n, {selected_origin})
-                               for n in sub_nodes]
+                init_colors = [get_node_color(n, {selected_origin}, selected_origin) for n in sub_nodes]
+                init_sizes  = [get_node_size(n, {selected_origin}) for n in sub_nodes]
                 init_node   = go.Scatter(
-                    x=node_x, y=node_y,
-                    mode="markers+text",
+                    x=node_x, y=node_y, mode="markers+text",
                     marker=dict(
                         color=init_colors, size=init_sizes,
-                        opacity=[1.0 if n == selected_origin
-                                 else 0.3 for n in sub_nodes],
+                        opacity=[1.0 if n == selected_origin else 0.3 for n in sub_nodes],
                         line=dict(
-                            color=["#ff4444" if n == selected_origin
-                                   else "#30363d" for n in sub_nodes],
-                            width=[3 if n == selected_origin
-                                   else 0.5 for n in sub_nodes]
+                            color=["#ff4444" if n == selected_origin else "#30363d" for n in sub_nodes],
+                            width=[3 if n == selected_origin else 0.5 for n in sub_nodes]
                         )
                     ),
-                    text=[n.split(":")[-1] if ":" in n else n
-                          for n in sub_nodes],
+                    text=[n.split(":")[-1] if ":" in n else n for n in sub_nodes],
                     textposition="top center",
                     textfont=dict(color="#8b949e", size=9),
                     hoverinfo="none", showlegend=False
                 )
-
                 empty_atk = go.Scatter(
                     x=[], y=[], mode="lines",
                     line=dict(color="#ff4444", width=2.5, dash="dot"),
@@ -1325,121 +1390,76 @@ with tab3:
                     layout=go.Layout(
                         paper_bgcolor="rgba(0,0,0,0)",
                         plot_bgcolor="#0d1117",
-                        xaxis=dict(showgrid=False, zeroline=False,
-                                   showticklabels=False),
-                        yaxis=dict(showgrid=False, zeroline=False,
-                                   showticklabels=False),
+                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
                         height=580,
                         margin=dict(t=30, b=80, l=20, r=20),
                         updatemenus=[dict(
-                            type="buttons",
-                            showactive=False,
-                            y=0.02, x=0.5,
-                            xanchor="center", yanchor="bottom",
-                            bgcolor="#161b22",
-                            bordercolor="#30363d",
+                            type="buttons", showactive=False,
+                            y=0.02, x=0.5, xanchor="center", yanchor="bottom",
+                            bgcolor="#161b22", bordercolor="#30363d",
                             font=dict(color="#e6edf3", size=13),
                             buttons=[
-                                dict(
-                                    label="▶  Play Attack",
-                                    method="animate",
-                                    args=[None, dict(
-                                        frame=dict(duration=700,
-                                                   redraw=True),
-                                        fromcurrent=True,
-                                        transition=dict(
-                                            duration=400,
-                                            easing="cubic-in-out"
-                                        )
-                                    )]
-                                ),
-                                dict(
-                                    label="⏸  Pause",
-                                    method="animate",
-                                    args=[[None], dict(
-                                        frame=dict(duration=0,
-                                                   redraw=False),
-                                        mode="immediate",
-                                        transition=dict(duration=0)
-                                    )]
-                                ),
-                                dict(
-                                    label="↺  Reset",
-                                    method="animate",
-                                    args=[["0"], dict(
-                                        mode="immediate",
-                                        frame=dict(duration=0,
-                                                   redraw=True),
-                                        transition=dict(duration=0)
-                                    )]
-                                )
+                                dict(label="▶  Play Attack", method="animate",
+                                     args=[None, dict(frame=dict(duration=700, redraw=True),
+                                                      fromcurrent=True,
+                                                      transition=dict(duration=400, easing="cubic-in-out"))]),
+                                dict(label="⏸  Pause", method="animate",
+                                     args=[[None], dict(frame=dict(duration=0, redraw=False),
+                                                        mode="immediate", transition=dict(duration=0))]),
+                                dict(label="↺  Reset", method="animate",
+                                     args=[["0"], dict(mode="immediate",
+                                                       frame=dict(duration=0, redraw=True),
+                                                       transition=dict(duration=0))]),
                             ]
                         )],
                         sliders=[dict(
                             active=0,
-                            currentvalue=dict(
-                                prefix="Step: ",
-                                font=dict(color="#8b949e", size=12)
-                            ),
+                            currentvalue=dict(prefix="Step: ", font=dict(color="#8b949e", size=12)),
                             pad=dict(t=50, b=10),
-                            bgcolor="#161b22",
-                            bordercolor="#30363d",
-                            tickcolor="#30363d",
-                            font=dict(color="#8b949e"),
+                            bgcolor="#161b22", bordercolor="#30363d",
+                            tickcolor="#30363d", font=dict(color="#8b949e"),
                             steps=[
-                                dict(
-                                    method="animate",
-                                    args=[[str(k)], dict(
-                                        mode="immediate",
-                                        frame=dict(duration=300,
-                                                   redraw=True),
-                                        transition=dict(duration=150)
-                                    )],
-                                    label=str(k + 1)
-                                )
+                                dict(method="animate",
+                                     args=[[str(k)], dict(mode="immediate",
+                                                          frame=dict(duration=300, redraw=True),
+                                                          transition=dict(duration=150))],
+                                     label=str(k + 1))
                                 for k in range(len(frames))
                             ]
                         )]
                     )
                 )
-
                 st.plotly_chart(fig_anim, use_container_width=True)
 
-                # Insight callout below animation
-                br = sim_result["blast_radius"]
-                sim_node = results.get(selected_origin, {})
-                mean_br  = sim_node.get("mean_blast_radius", 0)
-                p95_br   = sim_node.get("p95_blast_radius", 0)
+                br        = sim_result["blast_radius"]
+                sim_node  = results.get(selected_origin, {})
+                mean_br   = sim_node.get("mean_blast_radius", 0)
+                p95_br    = sim_node.get("p95_blast_radius", 0)
                 crit_rate = sim_node.get("critical_hit_rate", 0)
 
                 if br <= 2:
                     insight = (
                         f"This package has a **contained blast radius** "
                         f"in this simulation run ({br} node(s) affected). "
-                        f"Across 1000 simulations the mean is "
-                        f"**{mean_br:.1f} nodes** with a worst-case of "
-                        f"**{p95_br} nodes**. "
-                        f"{'⚠️ Critical cascade probability: '  + str(round(crit_rate*100,1)) + '%' if crit_rate > 0 else ''}"
+                        f"Across 1000 simulations the mean is **{mean_br:.1f} nodes** "
+                        f"with a worst-case of **{p95_br} nodes**. "
+                        f"{'⚠️ Critical cascade probability: ' + str(round(crit_rate*100,1)) + '%' if crit_rate > 0 else ''}"
                     )
                 else:
                     insight = (
-                        f"This attack propagated to **{br} nodes** "
-                        f"in this simulation run. "
-                        f"Across 1000 simulations the mean blast radius is "
-                        f"**{mean_br:.1f} nodes** with a worst-case P95 of "
-                        f"**{p95_br} nodes**."
+                        f"This attack propagated to **{br} nodes** in this simulation run. "
+                        f"Across 1000 simulations the mean blast radius is **{mean_br:.1f} nodes** "
+                        f"with a worst-case P95 of **{p95_br} nodes**."
                     )
                 st.info(insight)
 
                 s1, s2, s3, s4 = st.columns(4)
                 s1.metric("This Run — Blast Radius", br)
-                s2.metric("Mean (1000 runs)",
-                          f"{mean_br:.1f}")
+                s2.metric("Mean (1000 runs)", f"{mean_br:.1f}")
                 s3.metric("P95 Worst Case", p95_br)
-                s4.metric("Critical Hit Rate",
-                          f"{crit_rate*100:.1f}%")
+                s4.metric("Critical Hit Rate", f"{crit_rate*100:.1f}%")
 
-        # ── Aggregate charts ──────────────────────────────────────────────
         st.markdown("### 📊 Simulation Aggregate Results")
         c1, c2 = st.columns(2, gap="large")
 
@@ -1449,25 +1469,18 @@ with tab3:
                 x=sim_df["exposure_score"],
                 y=sim_df["package"].str.split(":").str[-1],
                 orientation="h",
-                marker=dict(
-                    color=sim_df["risk_class"].map(RISK_COLORS),
-                    line=dict(width=0)
-                ),
+                marker=dict(color=sim_df["risk_class"].map(RISK_COLORS), line=dict(width=0)),
                 text=sim_df["exposure_score"].round(1),
                 textposition="outside",
                 textfont=dict(color='#1a1f3a' if is_light else '#e6edf3', size=11),
-                hovertemplate=(
-                    "<b>%{y}</b><br>Exposure: %{x:.1f}<extra></extra>"
-                )
+                hovertemplate="<b>%{y}</b><br>Exposure: %{x:.1f}<extra></extra>"
             ))
             fig_exp.update_layout(
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor ="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                 xaxis=dict(showgrid=True, gridcolor='#e0e3e8' if is_light else '#30363d',
                            color='#6b7280' if is_light else '#8b949e'),
                 yaxis=dict(color='#1a1f3a' if is_light else '#e6edf3', autorange="reversed"),
-                margin=dict(t=10, b=10, l=10, r=60),
-                height=350,
+                margin=dict(t=10, b=10, l=10, r=60), height=350,
             )
             st.plotly_chart(fig_exp, use_container_width=True)
 
@@ -1478,46 +1491,33 @@ with tab3:
                 name="Mean",
                 x=sim_df["package"].str.split(":").str[-1],
                 y=sim_df["mean_blast_radius"],
-                marker_color="#58a6ff",
-                opacity=0.85
+                marker_color="#58a6ff", opacity=0.85
             ))
             fig_br.add_trace(go.Bar(
                 name="P95 worst case",
                 x=sim_df["package"].str.split(":").str[-1],
                 y=sim_df["p95_blast_radius"],
-                marker_color="#ff7b72",
-                opacity=0.65
+                marker_color="#ff7b72", opacity=0.65
             ))
             fig_br.update_layout(
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor ="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                 barmode="group",
-                xaxis=dict(showgrid=False, color='#6b7280' if is_light else '#8b949e',
-                           tickangle=-30),
+                xaxis=dict(showgrid=False, color='#6b7280' if is_light else '#8b949e', tickangle=-30),
                 yaxis=dict(showgrid=True, gridcolor='#e0e3e8' if is_light else '#30363d',
-                           color='#6b7280' if is_light else '#8b949e',
-                           title="Nodes affected"),
+                           color='#6b7280' if is_light else '#8b949e', title="Nodes affected"),
                 legend=dict(font=dict(color='#1a1f3a' if is_light else '#e6edf3')),
-                margin=dict(t=10, b=60, l=10, r=10),
-                height=350,
+                margin=dict(t=10, b=60, l=10, r=10), height=350,
             )
             st.plotly_chart(fig_br, use_container_width=True)
 
-        # Scatter
         st.markdown("**Critical Hit Rate vs Exposure Score**")
         fig_scatter = px.scatter(
-            sim_df,
-            x="exposure_score",
-            y="critical_hit_rate",
-            color="risk_class",
-            size="mean_blast_radius",
-            hover_name="package",
+            sim_df, x="exposure_score", y="critical_hit_rate",
+            color="risk_class", size="mean_blast_radius", hover_name="package",
             color_discrete_map=RISK_COLORS,
-            labels={
-                "exposure_score":    "Exposure Score",
-                "critical_hit_rate": "Critical Hit Rate (%)",
-                "risk_class":        "Risk Class"
-            },
+            labels={"exposure_score": "Exposure Score",
+                    "critical_hit_rate": "Critical Hit Rate (%)",
+                    "risk_class": "Risk Class"},
             size_max=30,
         )
         fig_scatter.update_layout(
@@ -1533,29 +1533,24 @@ with tab3:
         )
         st.plotly_chart(fig_scatter, use_container_width=True)
 
-        # Systemic risk nodes
-        sim_all = load_json("output/simulation_results.json") or {}
-        summary = sim_all.get("__summary__", {})
+        sim_all  = load_json("output/simulation_results.json") or {}
+        summary  = sim_all.get("__summary__", {})
         systemic = summary.get("systemic_risk_nodes", [])
         if systemic:
-            st.markdown(
-                "**Systemic Risk Nodes** "
-                "*(infected in >50% of all simulations)*"
-            )
+            st.markdown("**Systemic Risk Nodes** *(infected in >50% of all simulations)*")
             cols = st.columns(min(len(systemic), 4))
             for i, node in enumerate(systemic[:8]):
-                rc = G.nodes[node].get("risk_class", "CLEAN") \
-                     if node in G.nodes else "UNKNOWN"
+                rc = G.nodes[node].get("risk_class", "CLEAN") if node in G.nodes else "UNKNOWN"
                 with cols[i % 4]:
                     st.markdown(
                         f'<div class="info-card" style="text-align:center;">'
-                        f'<div style="font-size:12px; color:#e6edf3; '
-                        f'font-weight:600;">'
+                        f'<div style="font-size:12px; color:#e6edf3; font-weight:600;">'
                         f'{node.split(":")[-1]}</div>'
                         f'<div style="margin-top:8px;">{badge(rc)}</div>'
                         f'</div>',
                         unsafe_allow_html=True
                     )
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 4 — MITIGATION PLAN
@@ -1575,18 +1570,17 @@ with tab4:
             help="Adjust budget to see which fixes fit"
         )
 
-        # Re-run knapsack for selected budget on the fly
         from optimizer.knapsack import knapsack_optimize
-        all_items = plan_data.get("all_items_ranked", [])
-        result    = knapsack_optimize(all_items, budget)
-        selected  = result["selected_fixes"]
+        all_items   = plan_data.get("all_items_ranked", [])
+        result      = knapsack_optimize(all_items, budget)
+        selected    = result["selected_fixes"]
         unaddressed = result["unaddressed_fixes"]
 
         m1, m2, m3, m4 = st.columns(4)
-        m1.metric("Fixes Selected",    len(selected))
-        m2.metric("Hours Used",        f"{result['total_cost']}h")
-        m3.metric("Hours Remaining",   f"{result['remaining_budget']}h")
-        m4.metric("Risk Reduction",    f"{result['risk_reduction_pct']}%")
+        m1.metric("Fixes Selected",  len(selected))
+        m2.metric("Hours Used",      f"{result['total_cost']}h")
+        m3.metric("Hours Remaining", f"{result['remaining_budget']}h")
+        m4.metric("Risk Reduction",  f"{result['risk_reduction_pct']}%")
 
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -1597,13 +1591,11 @@ with tab4:
                 fix_ver  = item.get("fixed_in") or "—"
                 node     = item.get("node", "")
                 pkg_name = node.split(":")[-1] if ":" in node else node
-                exp      = G.nodes[node].get("explanation", "") \
-                           if node in G.nodes else ""
+                exp      = G.nodes[node].get("explanation", "") if node in G.nodes else ""
 
                 st.markdown(f"""
                 <div class="info-card" style="margin-bottom:10px;">
-                    <div style="display:flex; justify-content:space-between;
-                                align-items:center;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div style="display:flex; align-items:center; gap:12px;">
                             <div style="font-size:18px; font-weight:700;
                                         color:{'#6b7280' if is_light else '#8b949e'}; min-width:28px;">
@@ -1621,23 +1613,19 @@ with tab4:
                         <div style="display:flex; gap:12px; align-items:center;">
                             {badge(rc)}
                             <div style="text-align:right;">
-                                <div style="font-size:12px; color:{'#6b7280' if is_light else '#8b949e'};">
-                                    CVSS</div>
-                                <div style="font-weight:600;
-                                            color:{RISK_COLORS.get(rc,'#6b7280' if is_light else '#8b949e')};">
+                                <div style="font-size:12px; color:{'#6b7280' if is_light else '#8b949e'};">CVSS</div>
+                                <div style="font-weight:600; color:{RISK_COLORS.get(rc,'#6b7280')};">
                                     {item.get('cvss_score',0):.1f}
                                 </div>
                             </div>
                             <div style="text-align:right;">
-                                <div style="font-size:12px; color:{'#6b7280' if is_light else '#8b949e'};">
-                                    Cost</div>
+                                <div style="font-size:12px; color:{'#6b7280' if is_light else '#8b949e'};">Cost</div>
                                 <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'};">
                                     {item.get('cost_hours',0):.1f}h
                                 </div>
                             </div>
                             <div style="text-align:right;">
-                                <div style="font-size:12px;
-                                            color:{'#6b7280' if is_light else '#8b949e'};">Fix version</div>
+                                <div style="font-size:12px; color:{'#6b7280' if is_light else '#8b949e'};">Fix version</div>
                                 <div style="font-weight:600; color:{'#059669' if is_light else '#3fb950'};">
                                     {fix_ver}
                                 </div>
@@ -1661,7 +1649,6 @@ with tab4:
                         f"· {item.get('risk_class','—')} {tag}"
                     )
 
-        # Risk reduction efficiency chart
         st.markdown("<br>**Budget Efficiency — Risk Reduction per Scenario**")
         budgets_list = [4, 8, 12, 16, 20, 24, 32, 40, 56, 80]
         reductions   = []
@@ -1674,34 +1661,25 @@ with tab4:
             mode="lines+markers",
             line=dict(color="#238636", width=2),
             marker=dict(color="#3fb950", size=8),
-            fill="tozeroy",
-            fillcolor="rgba(35,134,54,0.15)",
+            fill="tozeroy", fillcolor="rgba(35,134,54,0.15)",
             hovertemplate="Budget: %{x}h → %{y:.1f}% risk reduction<extra></extra>"
         ))
-        # Mark current budget
         current_pct = knapsack_optimize(all_items, budget)["risk_reduction_pct"]
         fig_eff.add_vline(
-            x=budget,
-            line_dash="dash",
-            line_color="#58a6ff",
+            x=budget, line_dash="dash", line_color="#58a6ff",
             annotation_text=f"  {budget}h → {current_pct:.1f}%",
             annotation_font_color="#58a6ff"
         )
         fig_eff.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor='#f8f9fa' if is_light else '#161b22',
-            xaxis=dict(
-                title="Budget (hours)",
-                showgrid=True, gridcolor='#e0e3e8' if is_light else '#30363d',
-                color='#6b7280' if is_light else '#8b949e'
-            ),
-            yaxis=dict(
-                title="Risk Reduction (%)",
-                showgrid=True, gridcolor='#e0e3e8' if is_light else '#30363d',
-                color='#6b7280' if is_light else '#8b949e', range=[0, 105]
-            ),
-            height=300,
-            margin=dict(t=10, b=40, l=10, r=10),
+            xaxis=dict(title="Budget (hours)", showgrid=True,
+                       gridcolor='#e0e3e8' if is_light else '#30363d',
+                       color='#6b7280' if is_light else '#8b949e'),
+            yaxis=dict(title="Risk Reduction (%)", showgrid=True,
+                       gridcolor='#e0e3e8' if is_light else '#30363d',
+                       color='#6b7280' if is_light else '#8b949e', range=[0, 105]),
+            height=300, margin=dict(t=10, b=40, l=10, r=10),
             font=dict(color='#1a1f3a' if is_light else '#e6edf3')
         )
         st.plotly_chart(fig_eff, use_container_width=True)
@@ -1714,7 +1692,6 @@ with tab5:
     st.markdown('<div class="section-header">Package Vulnerability Details</div>',
                 unsafe_allow_html=True)
 
-    # Filter controls
     fc1, fc2, fc3 = st.columns(3)
     with fc1:
         filter_class = st.multiselect(
@@ -1724,18 +1701,13 @@ with tab5:
         )
     with fc2:
         filter_eco = st.multiselect(
-            "Ecosystem",
-            ["pypi", "npm", "maven"],
+            "Ecosystem", ["pypi", "npm", "maven"],
             default=["pypi", "npm", "maven"]
         )
     with fc3:
-        filter_fix = st.selectbox(
-            "Fix Available",
-            ["All", "Fix available", "No fix yet"]
-        )
+        filter_fix = st.selectbox("Fix Available", ["All", "Fix available", "No fix yet"])
 
-    fdf = df[df["risk_class"].isin(filter_class) &
-             df["ecosystem"].isin(filter_eco)]
+    fdf = df[df["risk_class"].isin(filter_class) & df["ecosystem"].isin(filter_eco)]
     if filter_fix == "Fix available":
         fdf = fdf[fdf["fix_available"] == True]
     elif filter_fix == "No fix yet":
@@ -1744,8 +1716,8 @@ with tab5:
     st.markdown(f"*Showing {len(fdf)} packages*")
 
     for _, row in fdf.iterrows():
-        node = row["package"]
-        data = G.nodes.get(node, {})
+        node  = row["package"]
+        data  = G.nodes.get(node, {})
         vulns = data.get("vulnerabilities", [])
 
         with st.expander(
@@ -1769,39 +1741,30 @@ with tab5:
             if vulns:
                 st.markdown("**Known Vulnerabilities**")
                 for v in vulns:
-                    color = RISK_COLORS.get(v.get("severity", ""), "#8b949e")
-                    fix   = v.get("fixed_in") or "No fix available"
-                    
-                    bg_color = "#f3f4f6" if is_light else "#1c2128"
-                    border_color = "#d1d5db" if is_light else "#30363d"
-                    text_gray = "#6b7280" if is_light else "#8b949e"
-                    fix_color = "#059669" if is_light else "#3fb950"
+                    color      = RISK_COLORS.get(v.get("severity", ""), "#8b949e")
+                    fix        = v.get("fixed_in") or "No fix available"
+                    bg_color   = "#f3f4f6" if is_light else "#1c2128"
+                    border_c   = "#d1d5db" if is_light else "#30363d"
+                    text_gray  = "#6b7280" if is_light else "#8b949e"
+                    fix_color  = "#059669" if is_light else "#3fb950"
                     link_color = "#2563eb" if is_light else "#58a6ff"
-                    
+
                     st.markdown(f"""
-                    <div style="background:{bg_color}; border:1px solid {border_color};
-                                border-radius:8px; padding:12px 16px;
-                                margin-bottom:8px;">
-                        <div style="display:flex; justify-content:space-between;
-                                    align-items:center;">
+                    <div style="background:{bg_color}; border:1px solid {border_c};
+                                border-radius:8px; padding:12px 16px; margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
                             <div>
-                                <span style="font-weight:600;
-                                             color:{color};">
+                                <span style="font-weight:600; color:{color};">
                                     {v.get('display_id','—')}
                                 </span>
-                                <span style="font-size:12px; color:{text_gray};
-                                             margin-left:10px;">
+                                <span style="font-size:12px; color:{text_gray}; margin-left:10px;">
                                     CVSS {v.get('cvss_score',0):.1f}
                                 </span>
                             </div>
                             <div style="font-size:12px;">
-                                <span style="color:{fix_color};">
-                                    Fix: {fix}
-                                </span>
-                                <a href="{v.get('detail_url','#')}"
-                                   target="_blank"
-                                   style="color:{link_color}; margin-left:12px;
-                                          text-decoration:none;">
+                                <span style="color:{fix_color};">Fix: {fix}</span>
+                                <a href="{v.get('detail_url','#')}" target="_blank"
+                                   style="color:{link_color}; margin-left:12px; text-decoration:none;">
                                     View ↗
                                 </a>
                             </div>
@@ -1814,11 +1777,14 @@ with tab5:
             else:
                 clean_color = "#059669" if is_light else "#3fb950"
                 st.markdown(
-                    f'<div style="color:{clean_color}; font-size:13px;">'
-                    '✅ No known vulnerabilities</div>',
+                    f'<div style="color:{clean_color}; font-size:13px;">✅ No known vulnerabilities</div>',
                     unsafe_allow_html=True
                 )
 
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 6 — ATTACK CLASSIFICATION
+# ══════════════════════════════════════════════════════════════════════════════
 with tab6:
     st.markdown('<div class="section-header">🛡️ Attack Classification</div>',
                 unsafe_allow_html=True)
@@ -1826,7 +1792,6 @@ with tab6:
     if st.session_state.G is None:
         st.info("⚠️ Run the pipeline first to analyze attack patterns.")
     else:
-        # Get unique packages with attack classifications
         attack_packages = []
         for node in st.session_state.G.nodes():
             if st.session_state.G.nodes[node].get("attack_classification"):
@@ -1841,10 +1806,7 @@ with tab6:
         if not attack_packages:
             st.info("No attack classifications available.")
         else:
-            # Package selector - show both package name and ecosystem
-            package_options = [p["package"] for p in attack_packages]
             display_names = [p["display_name"] for p in attack_packages]
-            
             selected_pkg_idx = st.selectbox(
                 "Select a package to view attack details:",
                 options=range(len(attack_packages)),
@@ -1852,46 +1814,38 @@ with tab6:
             )
 
             if 0 <= selected_pkg_idx < len(attack_packages):
-                p = attack_packages[selected_pkg_idx]
-                pkg_node = p["node"]
+                p           = attack_packages[selected_pkg_idx]
+                pkg_node    = p["node"]
                 attack_info = p["attack_info"]
 
                 if pkg_node and attack_info:
-                    # Display attack information
                     ac1, ac2, ac3 = st.columns(3)
                     with ac1:
-                        primary_attack = attack_info.get("primary_attack_type", attack_info.get("primary_attack", "Unknown"))
+                        primary_attack = attack_info.get("primary_attack_type",
+                                                         attack_info.get("primary_attack", "Unknown"))
                         st.markdown(f"""
                         <div class="metric-card">
-                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
-                                PRIMARY ATTACK TYPE
-                            </div>
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">PRIMARY ATTACK TYPE</div>
                             <div style="font-size:18px; font-weight:700; color:#f85149; margin-top:8px;">
                                 {primary_attack if primary_attack != "Unknown Attack Type" else "No CWE Match"}
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
-
                     with ac2:
                         attacker_cap = attack_info.get("attacker_capability", "Unknown")
                         st.markdown(f"""
                         <div class="metric-card">
-                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
-                                ATTACKER CAPABILITY
-                            </div>
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">ATTACKER CAPABILITY</div>
                             <div style="font-size:14px; font-weight:700; margin-top:8px; word-wrap:break-word;">
                                 {attacker_cap}
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
-
                     with ac3:
                         num_cwes = len(attack_info.get("cwe_ids", []))
                         st.markdown(f"""
                         <div class="metric-card">
-                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
-                                RELATED CWEs
-                            </div>
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">RELATED CWEs</div>
                             <div style="font-size:20px; font-weight:700; color:#79c0ff; margin-top:8px;">
                                 {num_cwes}
                             </div>
@@ -1900,7 +1854,6 @@ with tab6:
 
                     st.markdown("---")
 
-                    # Display CWE details
                     if attack_info.get("cwe_ids"):
                         st.markdown("**Related CWE Vulnerabilities**")
                         cwe_descriptions = attack_info.get("cwe_descriptions", {})
@@ -1917,7 +1870,6 @@ with tab6:
                             """, unsafe_allow_html=True)
                         st.markdown("---")
 
-                    # Display narrative
                     st.markdown("**Attack Narrative**")
                     narrative_text = attack_info.get("narrative", "No narrative available")
                     st.markdown(f"""
@@ -1929,6 +1881,10 @@ with tab6:
                     </div>
                     """, unsafe_allow_html=True)
 
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 7 — MODULE IMPACT
+# ══════════════════════════════════════════════════════════════════════════════
 with tab7:
     st.markdown('<div class="section-header">💥 Module Impact Analysis</div>',
                 unsafe_allow_html=True)
@@ -1938,7 +1894,6 @@ with tab7:
     if not impact_map:
         st.info("⚠️ Run the pipeline first to analyze module impact.")
     else:
-        # Get unique packages with impact data
         impact_packages = []
         for node_id, impact_data in impact_map.items():
             package_name = node_id.split(":")[1] if ":" in node_id else node_id
@@ -1952,9 +1907,7 @@ with tab7:
         if not impact_packages:
             st.info("No module impact data available.")
         else:
-            # Package selector - show both package name and ecosystem
             display_names = [p["display_name"] for p in impact_packages]
-            
             selected_impact_idx = st.selectbox(
                 "Select a vulnerable package to view impact:",
                 options=range(len(impact_packages)),
@@ -1962,60 +1915,49 @@ with tab7:
             )
 
             if 0 <= selected_impact_idx < len(impact_packages):
-                p = impact_packages[selected_impact_idx]
+                p                   = impact_packages[selected_impact_idx]
                 selected_impact_pkg = p["node_id"]
-                impact_data = p["impact_data"]
+                impact_data         = p["impact_data"]
 
                 if selected_impact_pkg in impact_map:
-                    # Overview metrics
                     im1, im2, im3, im4 = st.columns(4)
                     with im1:
                         affected_files = len(impact_data.get("affected_files", []))
                         st.markdown(f"""
                         <div class="metric-card">
-                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
-                                AFFECTED FILES
-                            </div>
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">AFFECTED FILES</div>
                             <div style="font-size:20px; font-weight:700; color:#79c0ff; margin-top:8px;">
                                 {affected_files}
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
-
                     with im2:
                         entry_points = len(impact_data.get("entry_points", []))
                         st.markdown(f"""
                         <div class="metric-card">
-                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
-                                ENTRY POINTS
-                            </div>
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">ENTRY POINTS</div>
                             <div style="font-size:20px; font-weight:700; color:#f85149; margin-top:8px;">
                                 {entry_points}
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
-
                     with im3:
                         features = len(impact_data.get("features", []))
                         st.markdown(f"""
                         <div class="metric-card">
-                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
-                                FEATURES AT RISK
-                            </div>
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">FEATURES AT RISK</div>
                             <div style="font-size:20px; font-weight:700; color:#d29922; margin-top:8px;">
                                 {features}
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
-
                     with im4:
-                        exposure = impact_data.get("exposure_scope", "MEDIUM")
-                        exposure_color = {"HIGH": "#f85149", "MEDIUM": "#d29922", "LOW": "#3fb950"}.get(exposure, "#8b949e")
+                        exposure      = impact_data.get("exposure_scope", "MEDIUM")
+                        exposure_color = {"HIGH": "#f85149", "MEDIUM": "#d29922",
+                                          "LOW": "#3fb950"}.get(exposure, "#8b949e")
                         st.markdown(f"""
                         <div class="metric-card">
-                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
-                                EXPOSURE SCOPE
-                            </div>
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">EXPOSURE SCOPE</div>
                             <div style="font-size:18px; font-weight:700; color:{exposure_color}; margin-top:8px;">
                                 {exposure}
                             </div>
@@ -2024,19 +1966,14 @@ with tab7:
 
                     st.markdown("---")
 
-                    # Display affected files
                     if impact_data.get("affected_files"):
                         st.markdown("**Affected Source Files**")
-                        file_list = impact_data.get("affected_files", [])
-                        
-                        # Categorize files
-                        for file_path in file_list:
+                        for file_path in impact_data.get("affected_files", []):
                             is_entry = "⚡" if file_path in impact_data.get("entry_points", []) else "📄"
                             st.markdown(f"{is_entry} `{file_path}`")
 
                     st.markdown("---")
 
-                    # Display entry points
                     if impact_data.get("entry_points"):
                         st.markdown("**Entry Points (Direct API surface)**")
                         for ep in impact_data.get("entry_points", []):
@@ -2050,26 +1987,18 @@ with tab7:
 
                     st.markdown("---")
 
-                    # Display features
                     if impact_data.get("features"):
                         st.markdown("**Inferred Features at Risk**")
                         features_list = impact_data.get("features", [])
-                        
-                        # Create feature badges
-                        feature_cols = st.columns(3)
+                        feature_cols  = st.columns(3)
                         for idx, feature in enumerate(features_list):
                             with feature_cols[idx % 3]:
                                 feature_icons = {
-                                    "Authentication": "🔐",
-                                    "Payment": "💳",
-                                    "File Upload": "📤",
-                                    "API Gateway": "🌐",
-                                    "Admin Panel": "⚙️",
-                                    "Email": "📧",
-                                    "Search": "🔍",
-                                    "User Management": "👥",
-                                    "Job Queue": "📋",
-                                    "Reporting": "📊"
+                                    "Authentication": "🔐", "Payment": "💳",
+                                    "File Upload": "📤", "API Gateway": "🌐",
+                                    "Admin Panel": "⚙️", "Email": "📧",
+                                    "Search": "🔍", "User Management": "👥",
+                                    "Job Queue": "📋", "Reporting": "📊"
                                 }
                                 icon = feature_icons.get(feature, "🏷️")
                                 st.markdown(f"""

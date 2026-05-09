@@ -356,8 +356,8 @@
             "cwe_ids": [
               "CWE-79"
             ],
-            "github_reviewed": true,
-            "nvd_published_at": "2026-04-24T03:16:11Z"
+            "nvd_published_at": "2026-04-24T03:16:11Z",
+            "github_reviewed": true
           },
           "aliases": [
             "CVE-2026-41305"
@@ -367,7 +367,7 @@
       "vuln_count": 1,
       "cvss_score": 3.15,
       "severity": "MODERATE",
-      "risk_score": 17.21,
+      "risk_score": 17.2,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -388,7 +388,7 @@
         "primary_attack_type": "Session Hijacking / Malware Delivery"
       },
       "exposure_score": 4.92,
-      "mean_blast_radius": 1.35,
+      "mean_blast_radius": 1.32,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.15 + 3 packages depend on it",
@@ -563,14 +563,14 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
-            "github_reviewed_at": "2024-06-17T22:31:08Z",
-            "nvd_published_at": "2024-06-06T19:16:06Z",
             "cwe_ids": [
               "CWE-921",
               "CWE-922"
             ],
-            "severity": "MODERATE"
+            "nvd_published_at": "2024-06-06T19:16:06Z",
+            "severity": "MODERATE",
+            "github_reviewed_at": "2024-06-17T22:31:08Z",
+            "github_reviewed": true
           },
           "aliases": [
             "CVE-2024-5206",
@@ -605,7 +605,7 @@
       "vuln_count": 2,
       "cvss_score": 3.2,
       "severity": "MODERATE",
-      "risk_score": 16.44,
+      "risk_score": 16.45,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -626,7 +626,7 @@
         "primary_attack_type": "Sensitive Data Exposure"
       },
       "exposure_score": 4.98,
-      "mean_blast_radius": 1.2,
+      "mean_blast_radius": 1.22,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.2",
@@ -4874,12 +4874,12 @@
           ],
           "database_specific": {
             "github_reviewed_at": "2026-02-17T16:38:57Z",
-            "nvd_published_at": "2026-02-11T19:15:50Z",
             "cwe_ids": [
               "CWE-1333",
               "CWE-400"
             ],
             "github_reviewed": true,
+            "nvd_published_at": "2026-02-11T19:15:50Z",
             "severity": "MODERATE"
           },
           "aliases": [
@@ -4914,7 +4914,7 @@
         "primary_attack_type": "Denial of Service"
       },
       "exposure_score": 1.45,
-      "mean_blast_radius": 1.16,
+      "mean_blast_radius": 1.17,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 0.85 + 3 packages depend on it",
@@ -5083,14 +5083,14 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-09T15:16:08Z",
-            "github_reviewed_at": "2026-04-09T17:32:19Z",
             "cwe_ids": [
               "CWE-441",
               "CWE-918"
             ],
+            "github_reviewed_at": "2026-04-09T17:32:19Z",
             "severity": "MODERATE",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "nvd_published_at": "2026-04-09T15:16:08Z"
           },
           "aliases": [
             "CVE-2025-62718"
@@ -5119,14 +5119,14 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-24T18:16:31Z",
+            "github_reviewed": true,
+            "severity": "MODERATE",
             "github_reviewed_at": "2026-05-05T00:19:33Z",
             "cwe_ids": [
               "CWE-1321",
               "CWE-915"
             ],
-            "severity": "MODERATE",
-            "github_reviewed": true
+            "nvd_published_at": "2026-04-24T18:16:31Z"
           },
           "aliases": [
             "CVE-2026-42044"
@@ -5179,14 +5179,14 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-02-09T21:15:49Z",
-            "github_reviewed_at": "2026-02-09T17:46:14Z",
             "cwe_ids": [
               "CWE-1321",
               "CWE-754"
             ],
+            "github_reviewed_at": "2026-02-09T17:46:14Z",
             "severity": "HIGH",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "nvd_published_at": "2026-02-09T21:15:49Z"
           },
           "aliases": [
             "CVE-2026-25639"
@@ -5215,13 +5215,13 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-24T18:16:30Z",
-            "github_reviewed_at": "2026-05-05T00:40:45Z",
             "cwe_ids": [
               "CWE-93"
             ],
+            "github_reviewed_at": "2026-05-05T00:40:45Z",
             "severity": "MODERATE",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "nvd_published_at": "2026-04-24T18:16:30Z"
           },
           "aliases": [
             "CVE-2026-42037"
@@ -5250,13 +5250,13 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-24T18:16:30Z",
+            "github_reviewed": true,
             "github_reviewed_at": "2026-05-05T00:33:25Z",
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-770"
             ],
-            "severity": "MODERATE",
-            "github_reviewed": true
+            "nvd_published_at": "2026-04-24T18:16:30Z"
           },
           "aliases": [
             "CVE-2026-42034"
@@ -5285,13 +5285,13 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-24T18:16:30Z",
+            "github_reviewed": true,
+            "severity": "MODERATE",
             "github_reviewed_at": "2026-05-05T00:34:32Z",
             "cwe_ids": [
               "CWE-674"
             ],
-            "severity": "MODERATE",
-            "github_reviewed": true
+            "nvd_published_at": "2026-04-24T18:16:30Z"
           },
           "aliases": [
             "CVE-2026-42039"
@@ -5320,14 +5320,14 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-24T18:16:30Z",
-            "github_reviewed_at": "2026-05-05T00:25:47Z",
             "cwe_ids": [
               "CWE-113",
               "CWE-1321"
             ],
             "severity": "HIGH",
-            "github_reviewed": true
+            "github_reviewed_at": "2026-05-05T00:25:47Z",
+            "github_reviewed": true,
+            "nvd_published_at": "2026-04-24T18:16:30Z"
           },
           "aliases": [
             "CVE-2026-42035"
@@ -5384,15 +5384,15 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-10T20:16:22Z",
-            "github_reviewed_at": "2026-04-10T19:47:16Z",
             "cwe_ids": [
               "CWE-113",
               "CWE-444",
               "CWE-918"
             ],
+            "github_reviewed_at": "2026-04-10T19:47:16Z",
             "severity": "MODERATE",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "nvd_published_at": "2026-04-10T20:16:22Z"
           },
           "aliases": [
             "CVE-2026-40175"
@@ -5421,13 +5421,13 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-24T18:16:30Z",
-            "github_reviewed_at": "2026-05-05T00:40:17Z",
             "cwe_ids": [
               "CWE-918"
             ],
             "severity": "MODERATE",
-            "github_reviewed": true
+            "github_reviewed_at": "2026-05-05T00:40:17Z",
+            "github_reviewed": true,
+            "nvd_published_at": "2026-04-24T18:16:30Z"
           },
           "aliases": [
             "CVE-2026-42038"
@@ -5456,13 +5456,13 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-24T18:16:29Z",
-            "github_reviewed_at": "2026-05-05T00:26:29Z",
             "cwe_ids": [
               "CWE-1321"
             ],
+            "github_reviewed_at": "2026-05-05T00:26:29Z",
             "severity": "HIGH",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "nvd_published_at": "2026-04-24T18:16:29Z"
           },
           "aliases": [
             "CVE-2026-42033"
@@ -5491,15 +5491,15 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-24T18:16:31Z",
-            "github_reviewed_at": "2026-05-05T00:20:58Z",
             "cwe_ids": [
               "CWE-183",
               "CWE-441",
               "CWE-918"
             ],
+            "github_reviewed_at": "2026-05-05T00:20:58Z",
             "severity": "HIGH",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "nvd_published_at": "2026-04-24T18:16:31Z"
           },
           "aliases": [
             "CVE-2026-42043"
@@ -5524,13 +5524,13 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": null,
-            "github_reviewed_at": "2026-05-05T00:18:38Z",
             "cwe_ids": [
               "CWE-1321"
             ],
+            "github_reviewed_at": "2026-05-05T00:18:38Z",
             "severity": "HIGH",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "nvd_published_at": null
           },
           "aliases": [
             "CVE-2026-42264"
@@ -5559,13 +5559,13 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-24T18:16:30Z",
-            "github_reviewed_at": "2026-05-05T00:26:57Z",
             "cwe_ids": [
               "CWE-770"
             ],
+            "github_reviewed_at": "2026-05-05T00:26:57Z",
             "severity": "MODERATE",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "nvd_published_at": "2026-04-24T18:16:30Z"
           },
           "aliases": [
             "CVE-2026-42036"
@@ -5594,14 +5594,14 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-24T18:16:31Z",
+            "github_reviewed": true,
+            "severity": "MODERATE",
             "github_reviewed_at": "2026-05-05T00:21:39Z",
             "cwe_ids": [
               "CWE-1321",
               "CWE-287"
             ],
-            "severity": "MODERATE",
-            "github_reviewed": true
+            "nvd_published_at": "2026-04-24T18:16:31Z"
           },
           "aliases": [
             "CVE-2026-42041"
@@ -5630,14 +5630,14 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-24T18:16:30Z",
-            "github_reviewed_at": "2026-05-05T00:18:03Z",
             "cwe_ids": [
               "CWE-116",
               "CWE-626"
             ],
             "severity": "LOW",
-            "github_reviewed": true
+            "github_reviewed_at": "2026-05-05T00:18:03Z",
+            "github_reviewed": true,
+            "nvd_published_at": "2026-04-24T18:16:30Z"
           },
           "aliases": [
             "CVE-2026-42040"
@@ -5666,14 +5666,14 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2026-04-24T18:16:31Z",
+            "github_reviewed": true,
+            "severity": "MODERATE",
             "github_reviewed_at": "2026-05-05T00:25:22Z",
             "cwe_ids": [
               "CWE-183",
               "CWE-201"
             ],
-            "severity": "MODERATE",
-            "github_reviewed": true
+            "nvd_published_at": "2026-04-24T18:16:31Z"
           },
           "aliases": [
             "CVE-2026-42042"
@@ -5683,7 +5683,7 @@
       "vuln_count": 16,
       "cvss_score": 3.8,
       "severity": "MODERATE",
-      "risk_score": 18.75,
+      "risk_score": 18.76,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -5735,7 +5735,7 @@
         "primary_attack_type": "Remote Code Execution"
       },
       "exposure_score": 5.88,
-      "mean_blast_radius": 1.11,
+      "mean_blast_radius": 1.14,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.8 + 16 known vulnerabilities",
@@ -5848,12 +5848,12 @@
             }
           ],
           "database_specific": {
-            "github_reviewed_at": "2026-03-26T18:29:42Z",
+            "github_reviewed": true,
             "nvd_published_at": "2026-03-27T15:16:57Z",
+            "github_reviewed_at": "2026-03-26T18:29:42Z",
             "cwe_ids": [
               "CWE-400"
             ],
-            "github_reviewed": true,
             "severity": "MODERATE"
           },
           "aliases": [
@@ -5864,7 +5864,7 @@
       "vuln_count": 1,
       "cvss_score": 3.15,
       "severity": "MODERATE",
-      "risk_score": 19.92,
+      "risk_score": 19.94,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -5885,7 +5885,7 @@
         "primary_attack_type": "Denial of Service"
       },
       "exposure_score": 4.91,
-      "mean_blast_radius": 1.24,
+      "mean_blast_radius": 1.28,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.15",
@@ -7590,13 +7590,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
-            "severity": "HIGH",
-            "github_reviewed_at": "2026-03-13T15:40:42Z",
-            "nvd_published_at": "2026-03-12T18:16:25Z",
             "cwe_ids": [
               "CWE-674"
-            ]
+            ],
+            "nvd_published_at": "2026-03-12T18:16:25Z",
+            "severity": "HIGH",
+            "github_reviewed_at": "2026-03-13T15:40:42Z",
+            "github_reviewed": true
           },
           "aliases": [
             "CVE-2026-32141"
@@ -7633,13 +7633,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
-            "severity": "HIGH",
-            "github_reviewed_at": "2026-03-19T17:43:54Z",
-            "nvd_published_at": "2026-03-20T23:16:46Z",
             "cwe_ids": [
               "CWE-1321"
-            ]
+            ],
+            "nvd_published_at": "2026-03-20T23:16:46Z",
+            "severity": "HIGH",
+            "github_reviewed_at": "2026-03-19T17:43:54Z",
+            "github_reviewed": true
           },
           "aliases": [
             "CVE-2026-33228"
@@ -7649,7 +7649,7 @@
       "vuln_count": 2,
       "cvss_score": 5.1,
       "severity": "HIGH",
-      "risk_score": 26.49,
+      "risk_score": 26.52,
       "risk_class": "HIGH",
       "fix_available": true,
       "attack_classification": {
@@ -7672,7 +7672,7 @@
         "primary_attack_type": "Sensitive Data Exposure"
       },
       "exposure_score": 7.84,
-      "mean_blast_radius": 1.31,
+      "mean_blast_radius": 1.38,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 5.1",
@@ -7733,11 +7733,11 @@
             }
           ],
           "database_specific": {
+            "nvd_published_at": null,
+            "github_reviewed_at": "2026-04-14T01:11:11Z",
             "cwe_ids": [
               "CWE-200"
             ],
-            "github_reviewed_at": "2026-04-14T01:11:11Z",
-            "nvd_published_at": null,
             "severity": "MODERATE",
             "github_reviewed": true
           },
@@ -7747,7 +7747,7 @@
       "vuln_count": 1,
       "cvss_score": 0.85,
       "severity": "MODERATE",
-      "risk_score": 7.82,
+      "risk_score": 7.83,
       "risk_class": "LOW",
       "fix_available": true,
       "attack_classification": {
@@ -7768,7 +7768,7 @@
         "primary_attack_type": "Sensitive Data Exposure"
       },
       "exposure_score": 1.45,
-      "mean_blast_radius": 1.09,
+      "mean_blast_radius": 1.12,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 0.85",
@@ -8551,13 +8551,13 @@
             }
           ],
           "database_specific": {
+            "nvd_published_at": "2025-11-13T16:15:57Z",
             "cwe_ids": [
               "CWE-1321"
             ],
-            "nvd_published_at": "2025-11-13T16:15:57Z",
             "github_reviewed_at": "2025-11-14T14:29:48Z",
-            "github_reviewed": true,
-            "severity": "MODERATE"
+            "severity": "MODERATE",
+            "github_reviewed": true
           },
           "aliases": [
             "CVE-2025-64718"
@@ -8588,7 +8588,7 @@
         "primary_attack_type": "Remote Code Execution / Denial of Service"
       },
       "exposure_score": 4.91,
-      "mean_blast_radius": 1.23,
+      "mean_blast_radius": 1.22,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.15",
@@ -9419,13 +9419,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
-            "nvd_published_at": "2026-02-26T02:16:21Z",
-            "severity": "HIGH",
+            "github_reviewed_at": "2026-02-26T22:07:15Z",
             "cwe_ids": [
               "CWE-1333"
             ],
-            "github_reviewed_at": "2026-02-26T22:07:15Z"
+            "nvd_published_at": "2026-02-26T02:16:21Z",
+            "github_reviewed": true,
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2026-27904"
@@ -9458,13 +9458,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
-            "nvd_published_at": "2026-02-20T03:16:01Z",
-            "severity": "HIGH",
+            "github_reviewed_at": "2026-02-18T22:38:11Z",
             "cwe_ids": [
               "CWE-1333"
             ],
-            "github_reviewed_at": "2026-02-18T22:38:11Z"
+            "nvd_published_at": "2026-02-20T03:16:01Z",
+            "github_reviewed": true,
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2026-26996"
@@ -9497,13 +9497,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
-            "nvd_published_at": "2026-02-26T02:16:21Z",
-            "severity": "HIGH",
+            "github_reviewed_at": "2026-02-26T22:10:18Z",
             "cwe_ids": [
               "CWE-407"
             ],
-            "github_reviewed_at": "2026-02-26T22:10:18Z"
+            "nvd_published_at": "2026-02-26T02:16:21Z",
+            "github_reviewed": true,
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2026-27903"
@@ -9513,7 +9513,7 @@
       "vuln_count": 3,
       "cvss_score": 3.25,
       "severity": "HIGH",
-      "risk_score": 17.95,
+      "risk_score": 17.97,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -9535,8 +9535,8 @@
         },
         "primary_attack_type": "Denial of Service"
       },
-      "exposure_score": 5.12,
-      "mean_blast_radius": 1.44,
+      "exposure_score": 5.13,
+      "mean_blast_radius": 1.48,
       "p95_blast_radius": 3,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.25 + 4 packages depend on it",
@@ -9917,13 +9917,13 @@
             }
           ],
           "database_specific": {
-            "severity": "MODERATE",
-            "github_reviewed_at": "2026-03-25T21:13:39Z",
-            "nvd_published_at": "2026-03-26T22:16:30Z",
             "cwe_ids": [
               "CWE-1321"
             ],
-            "github_reviewed": true
+            "github_reviewed_at": "2026-03-25T21:13:39Z",
+            "severity": "MODERATE",
+            "github_reviewed": true,
+            "nvd_published_at": "2026-03-26T22:16:30Z"
           },
           "aliases": [
             "CVE-2026-33672"
@@ -9956,13 +9956,13 @@
             }
           ],
           "database_specific": {
-            "severity": "HIGH",
-            "github_reviewed_at": "2026-03-25T21:12:07Z",
-            "nvd_published_at": "2026-03-26T22:16:30Z",
             "cwe_ids": [
               "CWE-1333"
             ],
-            "github_reviewed": true
+            "github_reviewed_at": "2026-03-25T21:12:07Z",
+            "severity": "HIGH",
+            "github_reviewed": true,
+            "nvd_published_at": "2026-03-26T22:16:30Z"
           },
           "aliases": [
             "CVE-2026-33671"
@@ -9995,9 +9995,9 @@
         },
         "primary_attack_type": "Remote Code Execution / Denial of Service"
       },
-      "exposure_score": 5.04,
-      "mean_blast_radius": 1.36,
-      "p95_blast_radius": 3,
+      "exposure_score": 4.99,
+      "mean_blast_radius": 1.35,
+      "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.2 + 3 packages depend on it",
       "impact_data": {
@@ -10457,13 +10457,13 @@
             }
           ],
           "database_specific": {
-            "severity": "HIGH",
+            "nvd_published_at": "2026-02-25T03:16:04Z",
             "cwe_ids": [
               "CWE-22"
             ],
-            "github_reviewed": true,
-            "nvd_published_at": "2026-02-25T03:16:04Z",
-            "github_reviewed_at": "2026-02-25T22:37:26Z"
+            "github_reviewed_at": "2026-02-25T22:37:26Z",
+            "severity": "HIGH",
+            "github_reviewed": true
           },
           "aliases": [
             "CVE-2026-27606"
@@ -10473,7 +10473,7 @@
       "vuln_count": 1,
       "cvss_score": 3.35,
       "severity": "HIGH",
-      "risk_score": 17.43,
+      "risk_score": 17.44,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -10494,7 +10494,7 @@
         "primary_attack_type": "Arbitrary File Read / Write"
       },
       "exposure_score": 5.21,
-      "mean_blast_radius": 1.22,
+      "mean_blast_radius": 1.25,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.35",
@@ -10755,13 +10755,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2026-01-28T01:16:14Z",
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-22",
               "CWE-59"
             ],
-            "github_reviewed": true,
-            "severity": "HIGH",
-            "nvd_published_at": "2026-01-28T01:16:14Z",
             "github_reviewed_at": "2026-01-28T16:35:31Z"
           },
           "aliases": [
@@ -10799,12 +10799,12 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2026-02-20T02:16:53Z",
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-22"
             ],
-            "github_reviewed": true,
-            "severity": "HIGH",
-            "nvd_published_at": "2026-02-20T02:16:53Z",
             "github_reviewed_at": "2026-02-18T00:57:13Z"
           },
           "aliases": [
@@ -10838,12 +10838,12 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2026-01-16T22:16:26Z",
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-22"
             ],
-            "github_reviewed": true,
-            "severity": "HIGH",
-            "nvd_published_at": "2026-01-16T22:16:26Z",
             "github_reviewed_at": "2026-01-16T21:16:20Z"
           },
           "aliases": [
@@ -10877,12 +10877,12 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2026-03-10T07:44:58Z",
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-22"
             ],
-            "github_reviewed": true,
-            "severity": "HIGH",
-            "nvd_published_at": "2026-03-10T07:44:58Z",
             "github_reviewed_at": "2026-03-10T23:44:58Z"
           },
           "aliases": [
@@ -10916,13 +10916,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2026-03-07T16:15:55Z",
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-22",
               "CWE-59"
             ],
-            "github_reviewed": true,
-            "severity": "HIGH",
-            "nvd_published_at": "2026-03-07T16:15:55Z",
             "github_reviewed_at": "2026-03-05T00:52:32Z"
           },
           "aliases": [
@@ -10956,13 +10956,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2026-01-20T01:15:57Z",
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-176",
               "CWE-367"
             ],
-            "github_reviewed": true,
-            "severity": "HIGH",
-            "nvd_published_at": "2026-01-20T01:15:57Z",
             "github_reviewed_at": "2026-01-21T01:05:49Z"
           },
           "aliases": [
@@ -10973,7 +10973,7 @@
       "vuln_count": 6,
       "cvss_score": 3.4,
       "severity": "HIGH",
-      "risk_score": 18.75,
+      "risk_score": 18.74,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -10999,8 +10999,8 @@
         },
         "primary_attack_type": "Remote Code Execution"
       },
-      "exposure_score": 5.29,
-      "mean_blast_radius": 1.27,
+      "exposure_score": 5.28,
+      "mean_blast_radius": 1.24,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.4 + 6 known vulnerabilities",
@@ -11275,14 +11275,14 @@
             }
           ],
           "database_specific": {
-            "severity": "MODERATE",
-            "github_reviewed_at": "2026-04-06T18:03:46Z",
             "nvd_published_at": "2026-04-07T20:16:30Z",
             "cwe_ids": [
               "CWE-200",
               "CWE-22"
             ],
-            "github_reviewed": true
+            "github_reviewed": true,
+            "github_reviewed_at": "2026-04-06T18:03:46Z",
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2026-39365"
@@ -11315,13 +11315,13 @@
             }
           ],
           "database_specific": {
-            "severity": "MODERATE",
-            "github_reviewed_at": "2025-10-20T19:54:28Z",
             "nvd_published_at": "2025-10-20T20:15:37Z",
             "cwe_ids": [
               "CWE-22"
             ],
-            "github_reviewed": true
+            "github_reviewed": true,
+            "github_reviewed_at": "2025-10-20T19:54:28Z",
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2025-62522"
@@ -11370,15 +11370,15 @@
             }
           ],
           "database_specific": {
-            "severity": "LOW",
-            "github_reviewed_at": "2025-09-09T20:55:56Z",
             "nvd_published_at": "2025-09-08T23:15:36Z",
             "cwe_ids": [
               "CWE-200",
               "CWE-22",
               "CWE-284"
             ],
-            "github_reviewed": true
+            "github_reviewed": true,
+            "github_reviewed_at": "2025-09-09T20:55:56Z",
+            "severity": "LOW"
           },
           "aliases": [
             "CVE-2025-58751"
@@ -11427,15 +11427,15 @@
             }
           ],
           "database_specific": {
-            "severity": "LOW",
-            "github_reviewed_at": "2025-09-09T20:54:42Z",
             "nvd_published_at": "2025-09-08T23:15:36Z",
             "cwe_ids": [
               "CWE-200",
               "CWE-23",
               "CWE-284"
             ],
-            "github_reviewed": true
+            "github_reviewed": true,
+            "github_reviewed_at": "2025-09-09T20:54:42Z",
+            "severity": "LOW"
           },
           "aliases": [
             "CVE-2025-58752"
@@ -11484,14 +11484,14 @@
             }
           ],
           "database_specific": {
-            "severity": "HIGH",
-            "github_reviewed": true,
             "nvd_published_at": "2026-04-07T20:16:30Z",
             "cwe_ids": [
               "CWE-200",
               "CWE-306"
             ],
-            "github_reviewed_at": "2026-04-06T18:03:24Z"
+            "github_reviewed": true,
+            "github_reviewed_at": "2026-04-06T18:03:24Z",
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2026-39363"
@@ -11536,14 +11536,14 @@
             }
           ],
           "database_specific": {
-            "severity": "HIGH",
-            "github_reviewed_at": "2026-04-06T18:03:32Z",
             "nvd_published_at": "2026-04-07T20:16:30Z",
             "cwe_ids": [
               "CWE-180",
               "CWE-284"
             ],
-            "github_reviewed": true
+            "github_reviewed": true,
+            "github_reviewed_at": "2026-04-06T18:03:32Z",
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2026-39364"
@@ -12183,13 +12183,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2026-01-22T05:16:17Z",
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-379"
             ],
-            "github_reviewed_at": "2026-04-13T16:38:46Z",
-            "nvd_published_at": "2026-01-22T05:16:17Z",
-            "severity": "MODERATE",
-            "github_reviewed": true
+            "github_reviewed_at": "2026-04-13T16:38:46Z"
           },
           "aliases": [
             "CVE-2025-71176"
@@ -12199,7 +12199,7 @@
       "vuln_count": 1,
       "cvss_score": 3.15,
       "severity": "MODERATE",
-      "risk_score": 17.28,
+      "risk_score": 17.3,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -12217,8 +12217,8 @@
         "cwe_descriptions": {},
         "primary_attack_type": "Sensitive Data Exposure"
       },
-      "exposure_score": 5.05,
-      "mean_blast_radius": 1.91,
+      "exposure_score": 5.06,
+      "mean_blast_radius": 1.96,
       "p95_blast_radius": 4,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.15 + 8 packages depend on it",
@@ -12344,13 +12344,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed_at": "2026-03-12T18:33:10Z",
-            "github_reviewed": true,
             "cwe_ids": [
               "CWE-22"
             ],
-            "nvd_published_at": "2026-03-12T20:16:06Z",
-            "severity": "HIGH"
+            "github_reviewed": true,
+            "severity": "HIGH",
+            "github_reviewed_at": "2026-03-12T18:33:10Z",
+            "nvd_published_at": "2026-03-12T20:16:06Z"
           },
           "aliases": [
             "CVE-2026-32274"
@@ -12391,14 +12391,14 @@
             }
           ],
           "database_specific": {
-            "github_reviewed_at": "2024-03-20T15:24:01Z",
-            "github_reviewed": true,
             "cwe_ids": [
               "CWE-1333",
               "CWE-75"
             ],
-            "nvd_published_at": "2024-03-19T05:15:09Z",
-            "severity": "MODERATE"
+            "github_reviewed": true,
+            "severity": "MODERATE",
+            "github_reviewed_at": "2024-03-20T15:24:01Z",
+            "nvd_published_at": "2024-03-19T05:15:09Z"
           },
           "aliases": [
             "CVE-2024-21503",
@@ -12437,7 +12437,7 @@
       "vuln_count": 3,
       "cvss_score": 3.2,
       "severity": "HIGH",
-      "risk_score": 16.47,
+      "risk_score": 16.46,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -12463,7 +12463,7 @@
         "primary_attack_type": "Remote Code Execution"
       },
       "exposure_score": 4.98,
-      "mean_blast_radius": 1.15,
+      "mean_blast_radius": 1.12,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.2",
@@ -12714,13 +12714,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
-            "severity": "HIGH",
-            "github_reviewed_at": "2021-06-22T16:00:52Z",
-            "nvd_published_at": "2021-06-21T20:15:00Z",
             "cwe_ids": [
               "CWE-770"
-            ]
+            ],
+            "github_reviewed_at": "2021-06-22T16:00:52Z",
+            "github_reviewed": true,
+            "severity": "HIGH",
+            "nvd_published_at": "2021-06-21T20:15:00Z"
           },
           "aliases": [
             "CVE-2021-29063",
@@ -12779,7 +12779,7 @@
       "vuln_count": 2,
       "cvss_score": 3.15,
       "severity": "HIGH",
-      "risk_score": 16.22,
+      "risk_score": 16.23,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -12800,7 +12800,7 @@
         "primary_attack_type": "Denial of Service"
       },
       "exposure_score": 4.9,
-      "mean_blast_radius": 1.11,
+      "mean_blast_radius": 1.14,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.15",
@@ -13830,12 +13830,12 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
-            "nvd_published_at": "2024-01-10T16:15:46Z",
             "severity": "HIGH",
             "cwe_ids": [
               "CWE-611"
             ],
+            "github_reviewed": true,
+            "nvd_published_at": "2024-01-10T16:15:46Z",
             "github_reviewed_at": "2024-01-09T16:01:10Z"
           },
           "aliases": [
@@ -13869,12 +13869,12 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
-            "nvd_published_at": "2025-11-29T01:16:02Z",
             "severity": "MODERATE",
             "cwe_ids": [
               "CWE-91"
             ],
+            "github_reviewed": true,
+            "nvd_published_at": "2025-11-29T01:16:02Z",
             "github_reviewed_at": "2025-12-01T19:07:00Z"
           },
           "aliases": [
@@ -14180,13 +14180,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2023-08-29T18:46:57Z",
             "cwe_ids": [
               "CWE-319"
             ],
-            "github_reviewed_at": "2023-08-29T18:46:57Z",
-            "severity": "HIGH",
+            "nvd_published_at": "2013-08-06T02:52:00Z",
             "github_reviewed": true,
-            "nvd_published_at": "2013-08-06T02:52:00Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2013-1633",
@@ -14236,13 +14236,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2025-05-19T16:52:43Z",
+            "nvd_published_at": "2025-05-17T16:15:19Z",
             "cwe_ids": [
               "CWE-22"
             ],
-            "severity": "HIGH",
-            "github_reviewed_at": "2025-05-19T16:52:43Z",
             "github_reviewed": true,
-            "nvd_published_at": "2025-05-17T16:15:19Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "BIT-setuptools-2025-47273",
@@ -14286,13 +14286,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2024-07-15T16:25:38Z",
             "cwe_ids": [
               "CWE-94"
             ],
-            "github_reviewed_at": "2024-07-15T16:25:38Z",
-            "severity": "HIGH",
+            "nvd_published_at": "2024-07-15T01:15:01Z",
             "github_reviewed": true,
-            "nvd_published_at": "2024-07-15T01:15:01Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "BIT-setuptools-2024-6345",
@@ -14378,13 +14378,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2022-12-27T14:51:05Z",
             "cwe_ids": [
               "CWE-1333"
             ],
-            "github_reviewed_at": "2022-12-27T14:51:05Z",
-            "severity": "HIGH",
+            "nvd_published_at": "2022-12-23T00:15:00Z",
             "github_reviewed": true,
-            "nvd_published_at": "2022-12-23T00:15:00Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "BIT-setuptools-2022-40897",
@@ -14495,7 +14495,7 @@
       "vuln_count": 7,
       "cvss_score": 5.25,
       "severity": "HIGH",
-      "risk_score": 24.86,
+      "risk_score": 24.87,
       "risk_class": "HIGH",
       "fix_available": true,
       "attack_classification": {
@@ -14523,9 +14523,9 @@
         },
         "primary_attack_type": "Remote Code Execution"
       },
-      "exposure_score": 8.11,
-      "mean_blast_radius": 1.2,
-      "p95_blast_radius": 3,
+      "exposure_score": 8.06,
+      "mean_blast_radius": 1.22,
+      "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 5.25 + 7 known vulnerabilities",
       "impact_data": {
@@ -14664,13 +14664,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
-            "github_reviewed_at": "2023-11-09T22:18:21Z",
             "nvd_published_at": "2023-11-09T09:15:08Z",
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-502"
             ],
-            "severity": "CRITICAL"
+            "severity": "CRITICAL",
+            "github_reviewed_at": "2023-11-09T22:18:21Z"
           },
           "aliases": [
             "CVE-2023-47248",
@@ -14708,13 +14708,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
-            "github_reviewed_at": "2022-06-28T14:36:34Z",
             "nvd_published_at": "2019-11-08T19:15:00Z",
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-909"
             ],
-            "severity": "HIGH"
+            "severity": "HIGH",
+            "github_reviewed_at": "2022-06-28T14:36:34Z"
           },
           "aliases": [
             "CVE-2019-12408",
@@ -14764,13 +14764,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
-            "github_reviewed_at": "2022-06-28T14:36:30Z",
             "nvd_published_at": "2019-11-08T19:15:00Z",
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-909"
             ],
-            "severity": "HIGH"
+            "severity": "HIGH",
+            "github_reviewed_at": "2022-06-28T14:36:30Z"
           },
           "aliases": [
             "CVE-2019-12410",
@@ -14904,7 +14904,7 @@
       "vuln_count": 7,
       "cvss_score": 5.45,
       "severity": "CRITICAL",
-      "risk_score": 25.84,
+      "risk_score": 25.81,
       "risk_class": "HIGH",
       "fix_available": true,
       "attack_classification": {
@@ -14927,7 +14927,7 @@
         "primary_attack_type": "Remote Code Execution"
       },
       "exposure_score": 8.43,
-      "mean_blast_radius": 1.56,
+      "mean_blast_radius": 1.5,
       "p95_blast_radius": 3,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 5.45 + 3 packages depend on it + 7 known vulnerabilities",
@@ -15085,13 +15085,13 @@
             }
           ],
           "database_specific": {
-            "severity": "CRITICAL",
-            "github_reviewed": true,
-            "github_reviewed_at": "2023-09-01T21:57:43Z",
-            "nvd_published_at": "2023-09-01T16:15:08Z",
             "cwe_ids": [
               "CWE-94"
-            ]
+            ],
+            "github_reviewed_at": "2023-09-01T21:57:43Z",
+            "github_reviewed": true,
+            "severity": "CRITICAL",
+            "nvd_published_at": "2023-09-01T16:15:08Z"
           },
           "aliases": [
             "CVE-2023-39631",
@@ -15149,7 +15149,7 @@
         "primary_attack_type": "Remote Code Execution"
       },
       "exposure_score": 5.43,
-      "mean_blast_radius": 1.14,
+      "mean_blast_radius": 1.13,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.5",
@@ -15377,13 +15377,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed_at": "2022-07-01T11:49:57Z",
-            "github_reviewed": true,
+            "nvd_published_at": "2017-02-15T19:59:00Z",
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-611"
             ],
-            "nvd_published_at": "2017-02-15T19:59:00Z",
-            "severity": "MODERATE"
+            "github_reviewed_at": "2022-07-01T11:49:57Z",
+            "github_reviewed": true
           },
           "aliases": [
             "CVE-2017-5992",
@@ -15430,7 +15430,7 @@
       "vuln_count": 2,
       "cvss_score": 3.35,
       "severity": "MODERATE",
-      "risk_score": 17.01,
+      "risk_score": 17.02,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -15451,7 +15451,7 @@
         "primary_attack_type": "Remote Code Execution / Data Theft"
       },
       "exposure_score": 5.2,
-      "mean_blast_radius": 1.11,
+      "mean_blast_radius": 1.13,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.35",
@@ -15759,12 +15759,12 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
             "nvd_published_at": "2019-02-06T21:29:00Z",
             "severity": "CRITICAL",
             "cwe_ids": [
               "CWE-89"
             ],
+            "github_reviewed": true,
             "github_reviewed_at": "2020-06-16T20:54:34Z"
           },
           "aliases": [
@@ -15839,12 +15839,12 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
             "nvd_published_at": "2019-02-20T00:29:00Z",
             "severity": "CRITICAL",
             "cwe_ids": [
               "CWE-89"
             ],
+            "github_reviewed": true,
             "github_reviewed_at": "2020-06-16T21:24:54Z"
           },
           "aliases": [
@@ -15915,12 +15915,12 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
             "nvd_published_at": "2012-06-05T22:55:00Z",
             "severity": "CRITICAL",
             "cwe_ids": [
               "CWE-89"
             ],
+            "github_reviewed": true,
             "github_reviewed_at": "2024-04-30T08:33:05Z"
           },
           "aliases": [
@@ -16096,7 +16096,7 @@
       "vuln_count": 6,
       "cvss_score": 5.45,
       "severity": "CRITICAL",
-      "risk_score": 25.43,
+      "risk_score": 25.44,
       "risk_class": "HIGH",
       "fix_available": true,
       "attack_classification": {
@@ -16117,7 +16117,7 @@
         "primary_attack_type": "Data Manipulation / Theft"
       },
       "exposure_score": 8.35,
-      "mean_blast_radius": 1.16,
+      "mean_blast_radius": 1.17,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 5.45 + 6 known vulnerabilities",
@@ -16260,13 +16260,13 @@
             }
           ],
           "database_specific": {
-            "nvd_published_at": "2024-05-21T16:15:26Z",
-            "github_reviewed": true,
+            "github_reviewed_at": "2024-05-21T19:23:15Z",
             "cwe_ids": [
               "CWE-89"
             ],
-            "severity": "CRITICAL",
-            "github_reviewed_at": "2024-05-21T19:23:15Z"
+            "nvd_published_at": "2024-05-21T16:15:26Z",
+            "github_reviewed": true,
+            "severity": "CRITICAL"
           },
           "aliases": [
             "CVE-2024-36039"
@@ -16276,7 +16276,7 @@
       "vuln_count": 1,
       "cvss_score": 3.45,
       "severity": "CRITICAL",
-      "risk_score": 17.41,
+      "risk_score": 17.42,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -16297,7 +16297,7 @@
         "primary_attack_type": "Data Manipulation / Theft"
       },
       "exposure_score": 5.35,
-      "mean_blast_radius": 1.1,
+      "mean_blast_radius": 1.12,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.45",
@@ -16440,12 +16440,12 @@
           ],
           "database_specific": {
             "github_reviewed_at": "2022-06-02T21:03:05Z",
-            "severity": "MODERATE",
-            "github_reviewed": true,
             "cwe_ids": [
               "CWE-79"
             ],
-            "nvd_published_at": "2017-02-22T16:59:00Z"
+            "nvd_published_at": "2017-02-22T16:59:00Z",
+            "github_reviewed": true,
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2016-9910",
@@ -16508,12 +16508,12 @@
           ],
           "database_specific": {
             "github_reviewed_at": "2022-07-06T19:51:12Z",
-            "severity": "MODERATE",
-            "github_reviewed": true,
             "cwe_ids": [
               "CWE-79"
             ],
-            "nvd_published_at": "2017-02-22T16:59:00Z"
+            "nvd_published_at": "2017-02-22T16:59:00Z",
+            "github_reviewed": true,
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2016-9909",
@@ -16620,7 +16620,7 @@
       "vuln_count": 4,
       "cvss_score": 3.1,
       "severity": "MODERATE",
-      "risk_score": 16.01,
+      "risk_score": 16.0,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -16640,8 +16640,8 @@
         },
         "primary_attack_type": "Session Hijacking / Malware Delivery"
       },
-      "exposure_score": 4.83,
-      "mean_blast_radius": 1.11,
+      "exposure_score": 4.82,
+      "mean_blast_radius": 1.09,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.1",
@@ -16751,10 +16751,10 @@
               "CWE-74",
               "CWE-79"
             ],
-            "severity": "MODERATE",
             "github_reviewed": true,
-            "nvd_published_at": "2021-12-13T18:15:00Z",
-            "github_reviewed_at": "2021-12-13T18:12:54Z"
+            "severity": "MODERATE",
+            "github_reviewed_at": "2021-12-13T18:12:54Z",
+            "nvd_published_at": "2021-12-13T18:15:00Z"
           },
           "aliases": [
             "CVE-2021-43818",
@@ -16863,10 +16863,10 @@
             "cwe_ids": [
               "CWE-79"
             ],
-            "severity": "MODERATE",
             "github_reviewed": true,
-            "nvd_published_at": "2014-05-14T19:55:00Z",
-            "github_reviewed_at": "2023-08-04T20:12:48Z"
+            "severity": "MODERATE",
+            "github_reviewed_at": "2023-08-04T20:12:48Z",
+            "nvd_published_at": "2014-05-14T19:55:00Z"
           },
           "aliases": [
             "CVE-2014-3146",
@@ -16955,10 +16955,10 @@
             "cwe_ids": [
               "CWE-79"
             ],
-            "severity": "MODERATE",
             "github_reviewed": true,
-            "nvd_published_at": "2021-03-21T05:15:00Z",
-            "github_reviewed_at": "2021-03-22T16:52:59Z"
+            "severity": "MODERATE",
+            "github_reviewed_at": "2021-03-22T16:52:59Z",
+            "nvd_published_at": "2021-03-21T05:15:00Z"
           },
           "aliases": [
             "CVE-2021-28957",
@@ -17047,10 +17047,10 @@
             "cwe_ids": [
               "CWE-79"
             ],
-            "severity": "MODERATE",
             "github_reviewed": true,
-            "nvd_published_at": "2020-12-03T17:15:00Z",
-            "github_reviewed_at": "2021-01-07T21:53:43Z"
+            "severity": "MODERATE",
+            "github_reviewed_at": "2021-01-07T21:53:43Z",
+            "nvd_published_at": "2020-12-03T17:15:00Z"
           },
           "aliases": [
             "CVE-2020-27783",
@@ -17091,10 +17091,10 @@
             "cwe_ids": [
               "CWE-611"
             ],
-            "severity": "HIGH",
             "github_reviewed": true,
-            "nvd_published_at": "2026-04-24T17:16:20Z",
-            "github_reviewed_at": "2026-04-21T20:38:44Z"
+            "severity": "HIGH",
+            "github_reviewed_at": "2026-04-21T20:38:44Z",
+            "nvd_published_at": "2026-04-24T17:16:20Z"
           },
           "aliases": [
             "CVE-2026-41066"
@@ -17170,10 +17170,10 @@
             "cwe_ids": [
               "CWE-476"
             ],
-            "severity": "MODERATE",
             "github_reviewed": true,
-            "nvd_published_at": "2022-07-05T10:15:00Z",
-            "github_reviewed_at": "2022-07-06T19:14:23Z"
+            "severity": "MODERATE",
+            "github_reviewed_at": "2022-07-06T19:14:23Z",
+            "nvd_published_at": "2022-07-05T10:15:00Z"
           },
           "aliases": [
             "CVE-2022-2309",
@@ -17230,10 +17230,10 @@
             "cwe_ids": [
               "CWE-79"
             ],
-            "severity": "MODERATE",
             "github_reviewed": true,
-            "nvd_published_at": "2018-12-02T10:29:00Z",
-            "github_reviewed_at": "2022-06-28T23:26:59Z"
+            "severity": "MODERATE",
+            "github_reviewed_at": "2022-06-28T23:26:59Z",
+            "nvd_published_at": "2018-12-02T10:29:00Z"
           },
           "aliases": [
             "CVE-2018-19787",
@@ -17500,7 +17500,7 @@
       "vuln_count": 13,
       "cvss_score": 3.45,
       "severity": "MODERATE",
-      "risk_score": 17.57,
+      "risk_score": 17.56,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -17528,7 +17528,7 @@
         "primary_attack_type": "Unauthorized Access"
       },
       "exposure_score": 5.36,
-      "mean_blast_radius": 1.23,
+      "mean_blast_radius": 1.21,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.45 + 13 known vulnerabilities",
@@ -17658,13 +17658,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-693"
             ],
-            "severity": "HIGH",
-            "github_reviewed": true,
+            "github_reviewed_at": "2020-06-16T20:57:35Z",
             "nvd_published_at": "2019-04-07T00:29:00Z",
-            "github_reviewed_at": "2020-06-16T20:57:35Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2019-10906",
@@ -17738,13 +17738,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-266"
             ],
-            "severity": "HIGH",
-            "github_reviewed": true,
+            "github_reviewed_at": "2022-07-07T22:50:31Z",
             "nvd_published_at": "2014-05-19T14:55:00Z",
-            "github_reviewed_at": "2022-07-07T22:50:31Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2014-1402",
@@ -17786,13 +17786,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-1336"
             ],
-            "severity": "MODERATE",
-            "github_reviewed": true,
+            "github_reviewed_at": "2025-03-05T20:40:14Z",
             "nvd_published_at": "2025-03-05T21:15:20Z",
-            "github_reviewed_at": "2025-03-05T20:40:14Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2025-27516"
@@ -17861,13 +17861,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-377"
             ],
-            "severity": "MODERATE",
-            "github_reviewed": true,
+            "github_reviewed_at": "2023-02-14T00:58:39Z",
             "nvd_published_at": "2014-05-19T14:55:00Z",
-            "github_reviewed_at": "2023-02-14T00:58:39Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2014-0012",
@@ -17925,13 +17925,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-400"
             ],
-            "severity": "MODERATE",
-            "github_reviewed": true,
+            "github_reviewed_at": "2021-03-13T01:08:09Z",
             "nvd_published_at": "2021-02-01T20:15:00Z",
-            "github_reviewed_at": "2021-03-13T01:08:09Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2020-28493",
@@ -17974,13 +17974,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-150"
             ],
-            "severity": "MODERATE",
-            "github_reviewed": true,
+            "github_reviewed_at": "2024-12-23T17:54:12Z",
             "nvd_published_at": "2024-12-23T16:15:07Z",
-            "github_reviewed_at": "2024-12-23T17:54:12Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2024-56201"
@@ -18037,13 +18037,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-79"
             ],
-            "severity": "MODERATE",
-            "github_reviewed": true,
+            "github_reviewed_at": "2024-01-11T15:20:48Z",
             "nvd_published_at": "2024-01-11T03:15:11Z",
-            "github_reviewed_at": "2024-01-11T15:20:48Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2024-22195"
@@ -18096,13 +18096,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-79"
             ],
-            "severity": "MODERATE",
-            "github_reviewed": true,
+            "github_reviewed_at": "2024-05-06T14:20:59Z",
             "nvd_published_at": "2024-05-06T15:15:23Z",
-            "github_reviewed_at": "2024-05-06T14:20:59Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2024-34064"
@@ -18179,13 +18179,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-134"
             ],
-            "severity": "HIGH",
-            "github_reviewed": true,
+            "github_reviewed_at": "2020-06-16T21:40:24Z",
             "nvd_published_at": null,
-            "github_reviewed_at": "2020-06-16T21:40:24Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2016-10745",
@@ -18227,13 +18227,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-693"
             ],
-            "severity": "MODERATE",
-            "github_reviewed": true,
+            "github_reviewed_at": "2024-12-23T17:56:08Z",
             "nvd_published_at": "2024-12-23T16:15:07Z",
-            "github_reviewed_at": "2024-12-23T17:56:08Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2024-56326"
@@ -18576,7 +18576,7 @@
       "vuln_count": 15,
       "cvss_score": 3.6,
       "severity": "HIGH",
-      "risk_score": 18.78,
+      "risk_score": 18.8,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -18611,8 +18611,8 @@
         },
         "primary_attack_type": "Unauthorized Access"
       },
-      "exposure_score": 5.64,
-      "mean_blast_radius": 1.39,
+      "exposure_score": 5.65,
+      "mean_blast_radius": 1.44,
       "p95_blast_radius": 3,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.6 + 3 packages depend on it + 15 known vulnerabilities",
@@ -18878,13 +18878,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed": true,
             "cwe_ids": [
               "CWE-415"
             ],
             "github_reviewed_at": "2020-03-12T17:02:28Z",
+            "nvd_published_at": null,
             "severity": "HIGH",
-            "nvd_published_at": null
+            "github_reviewed": true
           },
           "aliases": [
             "CVE-2019-18874",
@@ -18954,7 +18954,7 @@
         "primary_attack_type": "Remote Code Execution"
       },
       "exposure_score": 4.9,
-      "mean_blast_radius": 1.11,
+      "mean_blast_radius": 1.1,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.15",
@@ -19263,14 +19263,14 @@
             }
           ],
           "database_specific": {
+            "severity": "LOW",
             "cwe_ids": [
               "CWE-20",
               "CWE-78"
             ],
-            "nvd_published_at": "2023-02-10T20:15:00Z",
-            "github_reviewed_at": "2023-02-10T19:55:53Z",
             "github_reviewed": true,
-            "severity": "LOW"
+            "nvd_published_at": "2023-02-10T20:15:00Z",
+            "github_reviewed_at": "2023-02-10T19:55:53Z"
           },
           "aliases": [
             "CVE-2023-24816",
@@ -19344,13 +19344,13 @@
             }
           ],
           "database_specific": {
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-79"
             ],
-            "nvd_published_at": "2015-09-21T19:59:00Z",
-            "github_reviewed_at": "2022-07-06T20:10:16Z",
             "github_reviewed": true,
-            "severity": "MODERATE"
+            "nvd_published_at": "2015-09-21T19:59:00Z",
+            "github_reviewed_at": "2022-07-06T20:10:16Z"
           },
           "aliases": [
             "CVE-2015-6938",
@@ -19409,13 +19409,13 @@
             }
           ],
           "database_specific": {
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-79"
             ],
-            "nvd_published_at": "2017-09-20T18:29:00Z",
-            "github_reviewed_at": "2022-07-06T20:15:29Z",
             "github_reviewed": true,
-            "severity": "MODERATE"
+            "nvd_published_at": "2017-09-20T18:29:00Z",
+            "github_reviewed_at": "2022-07-06T20:15:29Z"
           },
           "aliases": [
             "CVE-2015-4707",
@@ -19485,13 +19485,13 @@
             }
           ],
           "database_specific": {
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-94"
             ],
-            "nvd_published_at": "2014-08-07T11:13:00Z",
-            "github_reviewed_at": "2024-04-29T11:32:00Z",
             "github_reviewed": true,
-            "severity": "HIGH"
+            "nvd_published_at": "2014-08-07T11:13:00Z",
+            "github_reviewed_at": "2024-04-29T11:32:00Z"
           },
           "aliases": [
             "CVE-2014-3429",
@@ -19549,13 +19549,13 @@
             }
           ],
           "database_specific": {
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-352"
             ],
-            "nvd_published_at": "2017-09-20T16:29:00Z",
-            "github_reviewed_at": "2022-06-03T15:42:47Z",
             "github_reviewed": true,
-            "severity": "HIGH"
+            "nvd_published_at": "2017-09-20T16:29:00Z",
+            "github_reviewed_at": "2022-06-03T15:42:47Z"
           },
           "aliases": [
             "CVE-2015-5607",
@@ -19617,13 +19617,13 @@
             }
           ],
           "database_specific": {
+            "severity": "CRITICAL",
             "cwe_ids": [
               "CWE-20"
             ],
-            "nvd_published_at": "2015-09-29T19:59:00Z",
-            "github_reviewed_at": "2022-07-06T20:09:00Z",
             "github_reviewed": true,
-            "severity": "CRITICAL"
+            "nvd_published_at": "2015-09-29T19:59:00Z",
+            "github_reviewed_at": "2022-07-06T20:09:00Z"
           },
           "aliases": [
             "CVE-2015-7337",
@@ -19690,15 +19690,15 @@
             }
           ],
           "database_specific": {
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-250",
               "CWE-269",
               "CWE-279"
             ],
-            "nvd_published_at": "2022-01-19T22:15:00Z",
-            "github_reviewed_at": "2022-01-19T21:26:17Z",
             "github_reviewed": true,
-            "severity": "HIGH"
+            "nvd_published_at": "2022-01-19T22:15:00Z",
+            "github_reviewed_at": "2022-01-19T21:26:17Z"
           },
           "aliases": [
             "CVE-2022-21699",
@@ -19756,13 +19756,13 @@
             }
           ],
           "database_specific": {
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-79"
             ],
-            "nvd_published_at": "2017-09-21T14:29:00Z",
-            "github_reviewed_at": "2022-07-06T20:15:42Z",
             "github_reviewed": true,
-            "severity": "MODERATE"
+            "nvd_published_at": "2017-09-21T14:29:00Z",
+            "github_reviewed_at": "2022-07-06T20:15:42Z"
           },
           "aliases": [
             "CVE-2015-4706",
@@ -20135,7 +20135,7 @@
       "vuln_count": 16,
       "cvss_score": 10.0,
       "severity": "LOW",
-      "risk_score": 58.9,
+      "risk_score": 58.91,
       "risk_class": "CRITICAL",
       "fix_available": true,
       "attack_classification": {
@@ -20174,7 +20174,7 @@
         "primary_attack_type": "Remote Code Execution"
       },
       "exposure_score": 40.26,
-      "mean_blast_radius": 1.58,
+      "mean_blast_radius": 1.61,
       "p95_blast_radius": 3,
       "critical_hit_rate": 1.0,
       "explanation": "Critical CVSS 10.0 + 100% chance of critical cascade + 16 known vulnerabilities",
@@ -20601,14 +20601,14 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
             "severity": "HIGH",
             "github_reviewed_at": "2024-03-18T20:26:33Z",
             "nvd_published_at": "2024-03-18T19:15:05Z",
             "cwe_ids": [
               "CWE-74",
               "CWE-77"
-            ],
-            "github_reviewed": true
+            ]
           },
           "aliases": [
             "CVE-2023-41334"
@@ -20639,7 +20639,7 @@
         "primary_attack_type": "Unauthorized Access"
       },
       "exposure_score": 4.9,
-      "mean_blast_radius": 1.1,
+      "mean_blast_radius": 1.08,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.15",
@@ -20838,14 +20838,14 @@
             }
           ],
           "database_specific": {
-            "github_reviewed_at": "2026-04-21T17:18:18Z",
             "cwe_ids": [
               "CWE-22",
               "CWE-73"
             ],
+            "github_reviewed_at": "2026-04-21T17:18:18Z",
             "github_reviewed": true,
-            "nvd_published_at": "2026-04-21T01:16:05Z",
-            "severity": "MODERATE"
+            "severity": "MODERATE",
+            "nvd_published_at": "2026-04-21T01:16:05Z"
           },
           "aliases": [
             "CVE-2026-39377"
@@ -20878,14 +20878,14 @@
             }
           ],
           "database_specific": {
-            "github_reviewed_at": "2026-04-21T17:18:53Z",
             "cwe_ids": [
               "CWE-22",
               "CWE-23"
             ],
+            "github_reviewed_at": "2026-04-21T17:18:53Z",
             "github_reviewed": true,
-            "nvd_published_at": "2026-04-21T01:16:06Z",
-            "severity": "MODERATE"
+            "severity": "MODERATE",
+            "nvd_published_at": "2026-04-21T01:16:06Z"
           },
           "aliases": [
             "CVE-2026-39378"
@@ -20926,13 +20926,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed_at": "2022-08-10T17:51:53Z",
             "cwe_ids": [
               "CWE-79"
             ],
+            "github_reviewed_at": "2022-08-10T17:51:53Z",
             "github_reviewed": true,
-            "nvd_published_at": "2022-08-18T19:15:00Z",
-            "severity": "MODERATE"
+            "severity": "MODERATE",
+            "nvd_published_at": "2022-08-18T19:15:00Z"
           },
           "aliases": [
             "CVE-2021-32862",
@@ -20983,13 +20983,13 @@
             }
           ],
           "database_specific": {
-            "github_reviewed_at": "2025-12-18T22:03:08Z",
             "cwe_ids": [
               "CWE-427"
             ],
+            "github_reviewed_at": "2025-12-18T22:03:08Z",
             "github_reviewed": true,
-            "nvd_published_at": "2025-12-17T21:16:14Z",
-            "severity": "HIGH"
+            "severity": "HIGH",
+            "nvd_published_at": "2025-12-17T21:16:14Z"
           },
           "aliases": [
             "CVE-2025-53000"
@@ -21153,10 +21153,10 @@
             "cwe_ids": [
               "CWE-502"
             ],
-            "severity": "CRITICAL",
-            "github_reviewed": true,
             "nvd_published_at": "2020-02-19T04:15:00Z",
-            "github_reviewed_at": "2021-04-08T19:24:04Z"
+            "github_reviewed_at": "2021-04-08T19:24:04Z",
+            "github_reviewed": true,
+            "severity": "CRITICAL"
           },
           "aliases": [
             "CVE-2019-20477",
@@ -21242,13 +21242,13 @@
             }
           ],
           "database_specific": {
+            "severity": "CRITICAL",
+            "nvd_published_at": "2020-03-24T15:15:00Z",
+            "github_reviewed_at": "2021-04-07T22:29:00Z",
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-20"
-            ],
-            "severity": "CRITICAL",
-            "github_reviewed": true,
-            "nvd_published_at": "2020-03-24T15:15:00Z",
-            "github_reviewed_at": "2021-04-07T22:29:00Z"
+            ]
           },
           "aliases": [
             "CVE-2020-1747",
@@ -21317,10 +21317,10 @@
             "cwe_ids": [
               "CWE-20"
             ],
-            "severity": "CRITICAL",
-            "github_reviewed": true,
             "nvd_published_at": "2021-02-09T21:15:00Z",
-            "github_reviewed_at": "2021-03-25T21:15:23Z"
+            "github_reviewed_at": "2021-03-25T21:15:23Z",
+            "github_reviewed": true,
+            "severity": "CRITICAL"
           },
           "aliases": [
             "CVE-2020-14343",
@@ -21393,10 +21393,10 @@
             "cwe_ids": [
               "CWE-502"
             ],
-            "severity": "CRITICAL",
-            "github_reviewed": true,
             "nvd_published_at": null,
-            "github_reviewed_at": "2020-06-16T21:55:26Z"
+            "github_reviewed_at": "2020-06-16T21:55:26Z",
+            "github_reviewed": true,
+            "severity": "CRITICAL"
           },
           "aliases": [
             "CVE-2017-18342",
@@ -21928,10 +21928,10 @@
               "CWE-1333",
               "CWE-400"
             ],
-            "nvd_published_at": "2026-03-22T06:16:20Z",
-            "github_reviewed_at": "2026-03-24T20:33:39Z",
             "github_reviewed": true,
-            "severity": "LOW"
+            "severity": "LOW",
+            "github_reviewed_at": "2026-03-24T20:33:39Z",
+            "nvd_published_at": "2026-03-22T06:16:20Z"
           },
           "aliases": [
             "CVE-2026-4539"
@@ -21987,10 +21987,10 @@
             "cwe_ids": [
               "CWE-835"
             ],
-            "nvd_published_at": "2021-03-23T17:15:00Z",
-            "github_reviewed_at": "2021-04-12T20:58:03Z",
             "github_reviewed": true,
-            "severity": "HIGH"
+            "severity": "HIGH",
+            "github_reviewed_at": "2021-04-12T20:58:03Z",
+            "nvd_published_at": "2021-03-23T17:15:00Z"
           },
           "aliases": [
             "CVE-2021-20270",
@@ -22067,10 +22067,10 @@
             "cwe_ids": [
               "CWE-78"
             ],
-            "nvd_published_at": "2016-01-08T20:59:00Z",
-            "github_reviewed_at": "2022-06-03T15:40:31Z",
             "github_reviewed": true,
-            "severity": "CRITICAL"
+            "severity": "CRITICAL",
+            "github_reviewed_at": "2022-06-03T15:40:31Z",
+            "nvd_published_at": "2016-01-08T20:59:00Z"
           },
           "aliases": [
             "CVE-2015-8557",
@@ -22135,10 +22135,10 @@
             "cwe_ids": [
               "CWE-434"
             ],
-            "nvd_published_at": "2023-07-19T15:15:10Z",
-            "github_reviewed_at": "2023-07-20T11:00:04Z",
             "github_reviewed": true,
-            "severity": "MODERATE"
+            "severity": "MODERATE",
+            "github_reviewed_at": "2023-07-20T11:00:04Z",
+            "nvd_published_at": "2023-07-19T15:15:10Z"
           },
           "aliases": [
             "CVE-2022-40896",
@@ -22207,10 +22207,10 @@
             "cwe_ids": [
               "CWE-400"
             ],
-            "nvd_published_at": "2021-03-17T13:15:00Z",
-            "github_reviewed_at": "2021-03-22T20:28:40Z",
             "github_reviewed": true,
-            "severity": "HIGH"
+            "severity": "HIGH",
+            "github_reviewed_at": "2021-03-22T20:28:40Z",
+            "nvd_published_at": "2021-03-17T13:15:00Z"
           },
           "aliases": [
             "CVE-2021-27291",
@@ -22397,7 +22397,7 @@
       "vuln_count": 9,
       "cvss_score": 10.0,
       "severity": "LOW",
-      "risk_score": 59.42,
+      "risk_score": 59.44,
       "risk_class": "CRITICAL",
       "fix_available": true,
       "attack_classification": {
@@ -22428,9 +22428,9 @@
         },
         "primary_attack_type": "Remote Code Execution"
       },
-      "exposure_score": 40.26,
-      "mean_blast_radius": 1.67,
-      "p95_blast_radius": 3,
+      "exposure_score": 40.32,
+      "mean_blast_radius": 1.72,
+      "p95_blast_radius": 4,
       "critical_hit_rate": 1.0,
       "explanation": "Critical CVSS 10.0 + 100% chance of critical cascade + 9 known vulnerabilities",
       "impact_data": {
@@ -22511,13 +22511,13 @@
             }
           ],
           "database_specific": {
-            "severity": "CRITICAL",
             "cwe_ids": [
               "CWE-668"
             ],
+            "github_reviewed_at": "2020-03-13T20:03:40Z",
             "github_reviewed": true,
-            "nvd_published_at": null,
-            "github_reviewed_at": "2020-03-13T20:03:40Z"
+            "severity": "CRITICAL",
+            "nvd_published_at": null
           },
           "aliases": [
             "CVE-2009-5042",
@@ -22571,7 +22571,7 @@
         "primary_attack_type": "Data Manipulation"
       },
       "exposure_score": 5.71,
-      "mean_blast_radius": 1.28,
+      "mean_blast_radius": 1.27,
       "p95_blast_radius": 3,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.65",
@@ -22683,13 +22683,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "severity": "HIGH",
             "github_reviewed_at": "2021-10-21T14:33:55Z",
             "cwe_ids": [
               "CWE-22"
             ],
-            "nvd_published_at": "2021-10-20T21:15:00Z",
-            "github_reviewed": true,
-            "severity": "HIGH"
+            "nvd_published_at": "2021-10-20T21:15:00Z"
           },
           "aliases": [
             "CVE-2021-42771",
@@ -22736,7 +22736,7 @@
       "vuln_count": 2,
       "cvss_score": 5.05,
       "severity": "HIGH",
-      "risk_score": 24.09,
+      "risk_score": 24.08,
       "risk_class": "HIGH",
       "fix_available": true,
       "attack_classification": {
@@ -22756,9 +22756,9 @@
         },
         "primary_attack_type": "Arbitrary File Read / Write"
       },
-      "exposure_score": 7.81,
-      "mean_blast_radius": 1.21,
-      "p95_blast_radius": 3,
+      "exposure_score": 7.76,
+      "mean_blast_radius": 1.19,
+      "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 5.05",
       "impact_data": {
@@ -22923,13 +22923,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2014-10-15T14:55:00Z",
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-200"
             ],
-            "nvd_published_at": "2014-10-15T14:55:00Z",
-            "severity": "MODERATE",
-            "github_reviewed_at": "2022-07-07T22:49:51Z",
-            "github_reviewed": true
+            "github_reviewed_at": "2022-07-07T22:49:51Z"
           },
           "aliases": [
             "CVE-2014-1830",
@@ -22995,13 +22995,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2025-06-09T18:15:24Z",
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-522"
             ],
-            "nvd_published_at": "2025-06-09T18:15:24Z",
-            "severity": "MODERATE",
-            "github_reviewed_at": "2025-06-09T19:06:08Z",
-            "github_reviewed": true
+            "github_reviewed_at": "2025-06-09T19:06:08Z"
           },
           "aliases": [
             "CVE-2024-47081"
@@ -23046,13 +23046,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2024-05-20T21:15:09Z",
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-670"
             ],
-            "nvd_published_at": "2024-05-20T21:15:09Z",
-            "severity": "MODERATE",
-            "github_reviewed_at": "2024-05-20T20:15:00Z",
-            "github_reviewed": true
+            "github_reviewed_at": "2024-05-20T20:15:00Z"
           },
           "aliases": [
             "CVE-2024-35195"
@@ -23117,13 +23117,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2014-10-15T14:55:00Z",
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-200"
             ],
-            "nvd_published_at": "2014-10-15T14:55:00Z",
-            "severity": "MODERATE",
-            "github_reviewed_at": "2022-07-07T22:49:52Z",
-            "github_reviewed": true
+            "github_reviewed_at": "2022-07-07T22:49:52Z"
           },
           "aliases": [
             "CVE-2014-1829",
@@ -23161,13 +23161,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2026-03-25T17:16:52Z",
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-377"
             ],
-            "nvd_published_at": "2026-03-25T17:16:52Z",
-            "severity": "MODERATE",
-            "github_reviewed_at": "2026-03-25T16:56:28Z",
-            "github_reviewed": true
+            "github_reviewed_at": "2026-03-25T16:56:28Z"
           },
           "aliases": [
             "CVE-2026-25645"
@@ -23224,13 +23224,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2023-05-26T18:15:14Z",
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-200"
             ],
-            "nvd_published_at": "2023-05-26T18:15:14Z",
-            "severity": "MODERATE",
-            "github_reviewed_at": "2023-05-22T20:36:32Z",
-            "github_reviewed": true
+            "github_reviewed_at": "2023-05-22T20:36:32Z"
           },
           "aliases": [
             "CVE-2023-32681",
@@ -23296,11 +23296,11 @@
             }
           ],
           "database_specific": {
-            "cwe_ids": [],
+            "github_reviewed": true,
             "nvd_published_at": "2015-03-18T16:59:00Z",
             "severity": "MODERATE",
-            "github_reviewed_at": "2023-07-31T23:49:22Z",
-            "github_reviewed": true
+            "cwe_ids": [],
+            "github_reviewed_at": "2023-07-31T23:49:22Z"
           },
           "aliases": [
             "CVE-2015-2296",
@@ -23370,13 +23370,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed": true,
+            "nvd_published_at": "2018-10-09T17:29:00Z",
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-522"
             ],
-            "nvd_published_at": "2018-10-09T17:29:00Z",
-            "severity": "HIGH",
-            "github_reviewed_at": "2020-06-16T22:02:40Z",
-            "github_reviewed": true
+            "github_reviewed_at": "2020-06-16T22:02:40Z"
           },
           "aliases": [
             "CVE-2018-18074",
@@ -23611,7 +23611,7 @@
       "vuln_count": 13,
       "cvss_score": 3.45,
       "severity": "MODERATE",
-      "risk_score": 18.58,
+      "risk_score": 18.59,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -23638,7 +23638,7 @@
         "primary_attack_type": "Unauthorized Access"
       },
       "exposure_score": 5.42,
-      "mean_blast_radius": 1.45,
+      "mean_blast_radius": 1.47,
       "p95_blast_radius": 3,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.45 + 4 packages depend on it + 13 known vulnerabilities",
@@ -24307,9 +24307,9 @@
             "cwe_ids": [
               "CWE-79"
             ],
-            "github_reviewed_at": "2022-04-26T20:29:02Z",
-            "severity": "MODERATE",
             "github_reviewed": true,
+            "severity": "MODERATE",
+            "github_reviewed_at": "2022-04-26T20:29:02Z",
             "nvd_published_at": "2020-01-15T21:15:00Z"
           },
           "aliases": [
@@ -24368,9 +24368,9 @@
             "cwe_ids": [
               "CWE-79"
             ],
-            "github_reviewed_at": "2020-04-22T19:19:38Z",
-            "severity": "MODERATE",
             "github_reviewed": true,
+            "severity": "MODERATE",
+            "github_reviewed_at": "2020-04-22T19:19:38Z",
             "nvd_published_at": null
           },
           "aliases": [
@@ -24428,9 +24428,9 @@
             "cwe_ids": [
               "CWE-1333"
             ],
-            "github_reviewed_at": "2021-05-12T21:02:47Z",
-            "severity": "HIGH",
             "github_reviewed": true,
+            "severity": "HIGH",
+            "github_reviewed_at": "2021-05-12T21:02:47Z",
             "nvd_published_at": "2021-03-03T16:15:00Z"
           },
           "aliases": [
@@ -24488,9 +24488,9 @@
             "cwe_ids": [
               "CWE-79"
             ],
-            "github_reviewed_at": "2020-06-16T21:48:21Z",
-            "severity": "MODERATE",
             "github_reviewed": true,
+            "severity": "MODERATE",
+            "github_reviewed_at": "2020-06-16T21:48:21Z",
             "nvd_published_at": null
           },
           "aliases": [
@@ -24819,11 +24819,11 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2024-05-03T19:33:28Z",
+            "nvd_published_at": "2024-05-03T10:15:08Z",
             "cwe_ids": [
               "CWE-74"
             ],
-            "nvd_published_at": "2024-05-03T10:15:08Z",
-            "github_reviewed_at": "2024-05-03T19:33:28Z",
             "github_reviewed": true,
             "severity": "LOW"
           },
@@ -24874,11 +24874,11 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2023-07-28T23:24:28Z",
+            "nvd_published_at": "2017-01-19T20:59:00Z",
             "cwe_ids": [
               "CWE-94"
             ],
-            "nvd_published_at": "2017-01-19T20:59:00Z",
-            "github_reviewed_at": "2023-07-28T23:24:28Z",
             "github_reviewed": true,
             "severity": "HIGH"
           },
@@ -24946,7 +24946,7 @@
         "primary_attack_type": "Unauthorized Access"
       },
       "exposure_score": 4.97,
-      "mean_blast_radius": 1.09,
+      "mean_blast_radius": 1.1,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.2",
@@ -25080,13 +25080,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2020-06-16T20:50:58Z",
             "cwe_ids": [
               "CWE-287"
             ],
-            "github_reviewed_at": "2020-06-16T20:50:58Z",
             "nvd_published_at": "2018-03-13T18:29:00Z",
-            "severity": "CRITICAL",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "severity": "CRITICAL"
           },
           "aliases": [
             "CVE-2018-7750",
@@ -25668,14 +25668,14 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2023-12-18T19:22:09Z",
             "cwe_ids": [
               "CWE-345",
               "CWE-354"
             ],
-            "github_reviewed_at": "2023-12-18T19:22:09Z",
             "nvd_published_at": "2023-12-18T16:15:10Z",
-            "severity": "MODERATE",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2023-48795",
@@ -25753,14 +25753,14 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2020-06-16T21:33:26Z",
             "cwe_ids": [
               "CWE-732",
               "CWE-863"
             ],
-            "github_reviewed_at": "2020-06-16T21:33:26Z",
             "nvd_published_at": "2018-10-08T15:29:00Z",
-            "severity": "HIGH",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2018-1000805",
@@ -25842,13 +25842,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2022-03-29T20:52:09Z",
             "cwe_ids": [
               "CWE-362"
             ],
-            "github_reviewed_at": "2022-03-29T20:52:09Z",
             "nvd_published_at": "2022-03-17T22:15:00Z",
-            "severity": "HIGH",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2022-24302",
@@ -25882,13 +25882,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2026-05-08T23:13:43Z",
             "cwe_ids": [
               "CWE-327"
             ],
-            "github_reviewed_at": "2026-05-08T23:13:43Z",
             "nvd_published_at": "2026-05-06T00:16:04Z",
-            "severity": "LOW",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "severity": "LOW"
           },
           "aliases": [
             "CVE-2026-44405"
@@ -25965,13 +25965,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2024-02-09T19:42:59Z",
             "cwe_ids": [
               "CWE-200"
             ],
-            "github_reviewed_at": "2024-02-09T19:42:59Z",
             "nvd_published_at": "2008-01-16T23:00:00Z",
-            "severity": "HIGH",
-            "github_reviewed": true
+            "github_reviewed": true,
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2008-0299",
@@ -26222,7 +26222,7 @@
       "vuln_count": 10,
       "cvss_score": 5.6,
       "severity": "CRITICAL",
-      "risk_score": 26.31,
+      "risk_score": 26.33,
       "risk_class": "HIGH",
       "fix_available": true,
       "attack_classification": {
@@ -26259,7 +26259,7 @@
         "primary_attack_type": "Unauthorized Access"
       },
       "exposure_score": 8.58,
-      "mean_blast_radius": 1.16,
+      "mean_blast_radius": 1.19,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 5.6 + 10 known vulnerabilities",
@@ -26432,11 +26432,11 @@
             }
           ],
           "database_specific": {
+            "nvd_published_at": "2024-07-05T19:15:10Z",
+            "github_reviewed_at": "2024-07-05T20:06:40Z",
             "cwe_ids": [
               "CWE-345"
             ],
-            "github_reviewed_at": "2024-07-05T20:06:40Z",
-            "nvd_published_at": "2024-07-05T19:15:10Z",
             "severity": "LOW",
             "github_reviewed": true
           },
@@ -26484,11 +26484,11 @@
             }
           ],
           "database_specific": {
+            "nvd_published_at": "2022-12-07T22:15:00Z",
+            "github_reviewed_at": "2022-12-07T23:05:18Z",
             "cwe_ids": [
               "CWE-345"
             ],
-            "github_reviewed_at": "2022-12-07T23:05:18Z",
-            "nvd_published_at": "2022-12-07T22:15:00Z",
             "severity": "MODERATE",
             "github_reviewed": true
           },
@@ -26540,11 +26540,11 @@
             }
           ],
           "database_specific": {
+            "nvd_published_at": "2023-07-25T21:15:10Z",
+            "github_reviewed_at": "2023-07-25T14:43:53Z",
             "cwe_ids": [
               "CWE-345"
             ],
-            "github_reviewed_at": "2023-07-25T14:43:53Z",
-            "nvd_published_at": "2023-07-25T21:15:10Z",
             "severity": "HIGH",
             "github_reviewed": true
           },
@@ -26645,7 +26645,7 @@
       "vuln_count": 6,
       "cvss_score": 3.3,
       "severity": "LOW",
-      "risk_score": 17.08,
+      "risk_score": 17.07,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -26664,7 +26664,7 @@
         "primary_attack_type": "Security Weakness"
       },
       "exposure_score": 5.13,
-      "mean_blast_radius": 1.12,
+      "mean_blast_radius": 1.1,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.3 + 6 known vulnerabilities",
@@ -26746,8 +26746,8 @@
               "CWE-400"
             ],
             "github_reviewed_at": "2024-04-11T21:32:40Z",
-            "severity": "MODERATE",
             "github_reviewed": true,
+            "severity": "MODERATE",
             "nvd_published_at": "2024-07-07T18:15:09Z"
           },
           "aliases": [
@@ -26806,7 +26806,7 @@
         },
         "primary_attack_type": "Denial of Service"
       },
-      "exposure_score": 4.98,
+      "exposure_score": 4.97,
       "mean_blast_radius": 1.1,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
@@ -26856,13 +26856,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2025-12-05T18:15:54Z",
             "cwe_ids": [
               "CWE-409"
             ],
-            "github_reviewed_at": "2025-12-05T18:15:54Z",
-            "severity": "HIGH",
+            "nvd_published_at": "2025-12-05T17:16:04Z",
             "github_reviewed": true,
-            "nvd_published_at": "2025-12-05T17:16:04Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2025-66471"
@@ -26911,13 +26911,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2024-06-17T21:37:20Z",
             "cwe_ids": [
               "CWE-669"
             ],
-            "github_reviewed_at": "2024-06-17T21:37:20Z",
-            "severity": "MODERATE",
+            "nvd_published_at": "2024-06-17T20:15:13Z",
             "github_reviewed": true,
-            "nvd_published_at": "2024-06-17T20:15:13Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2024-37891"
@@ -26954,13 +26954,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2026-01-07T19:18:14Z",
             "cwe_ids": [
               "CWE-409"
             ],
-            "github_reviewed_at": "2026-01-07T19:18:14Z",
-            "severity": "HIGH",
+            "nvd_published_at": "2026-01-07T22:15:44Z",
             "github_reviewed": true,
-            "nvd_published_at": "2026-01-07T22:15:44Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2026-21441"
@@ -26997,13 +26997,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2025-06-18T17:50:11Z",
             "cwe_ids": [
               "CWE-601"
             ],
-            "github_reviewed_at": "2025-06-18T17:50:11Z",
-            "severity": "MODERATE",
+            "nvd_published_at": "2025-06-19T02:15:17Z",
             "github_reviewed": true,
-            "nvd_published_at": "2025-06-19T02:15:17Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2025-50182"
@@ -27084,13 +27084,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2021-03-19T19:41:48Z",
             "cwe_ids": [
               "CWE-295"
             ],
-            "github_reviewed_at": "2021-03-19T19:41:48Z",
-            "severity": "MODERATE",
+            "nvd_published_at": "2021-03-15T18:15:00Z",
             "github_reviewed": true,
-            "nvd_published_at": "2021-03-15T18:15:00Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2021-28363",
@@ -27164,13 +27164,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2023-10-17T20:15:25Z",
             "cwe_ids": [
               "CWE-200"
             ],
-            "github_reviewed_at": "2023-10-17T20:15:25Z",
-            "severity": "MODERATE",
+            "nvd_published_at": "2023-10-17T20:15:10Z",
             "github_reviewed": true,
-            "nvd_published_at": "2023-10-17T20:15:10Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2023-45803",
@@ -27204,13 +27204,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2025-12-05T18:15:19Z",
             "cwe_ids": [
               "CWE-770"
             ],
-            "github_reviewed_at": "2025-12-05T18:15:19Z",
-            "severity": "HIGH",
+            "nvd_published_at": "2025-12-05T16:15:51Z",
             "github_reviewed": true,
-            "nvd_published_at": "2025-12-05T16:15:51Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2025-66418"
@@ -27251,14 +27251,14 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2023-10-17T14:21:39Z",
             "cwe_ids": [
               "CWE-200",
               "CWE-601"
             ],
-            "github_reviewed_at": "2023-10-17T14:21:39Z",
-            "severity": "MODERATE",
+            "nvd_published_at": "2023-10-15T19:15:09Z",
             "github_reviewed": true,
-            "nvd_published_at": "2023-10-15T19:15:09Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2018-25091",
@@ -27304,13 +27304,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2021-04-22T22:04:31Z",
             "cwe_ids": [
               "CWE-400"
             ],
-            "github_reviewed_at": "2021-04-22T22:04:31Z",
-            "severity": "HIGH",
+            "nvd_published_at": "2020-03-06T20:15:00Z",
             "github_reviewed": true,
-            "nvd_published_at": "2020-03-06T20:15:00Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2020-7212",
@@ -27396,13 +27396,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2019-04-19T16:54:21Z",
             "cwe_ids": [
               "CWE-295"
             ],
-            "github_reviewed_at": "2019-04-19T16:54:21Z",
-            "severity": "HIGH",
+            "nvd_published_at": "2019-04-18T21:29:00Z",
             "github_reviewed": true,
-            "nvd_published_at": "2019-04-18T21:29:00Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2019-11324",
@@ -27440,13 +27440,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2025-06-18T17:50:00Z",
             "cwe_ids": [
               "CWE-601"
             ],
-            "github_reviewed_at": "2025-06-18T17:50:00Z",
-            "severity": "MODERATE",
+            "nvd_published_at": "2025-06-19T01:15:24Z",
             "github_reviewed": true,
-            "nvd_published_at": "2025-06-19T01:15:24Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2025-50181"
@@ -27503,13 +27503,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2021-05-28T22:09:12Z",
             "cwe_ids": [
               "CWE-400"
             ],
-            "github_reviewed_at": "2021-05-28T22:09:12Z",
-            "severity": "HIGH",
+            "nvd_published_at": "2021-06-29T11:15:00Z",
             "github_reviewed": true,
-            "nvd_published_at": "2021-06-29T11:15:00Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2021-33503",
@@ -27603,13 +27603,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2022-06-28T15:02:18Z",
             "cwe_ids": [
               "CWE-93"
             ],
-            "github_reviewed_at": "2022-06-28T15:02:18Z",
-            "severity": "MODERATE",
+            "nvd_published_at": "2019-04-15T15:29:00Z",
             "github_reviewed": true,
-            "nvd_published_at": "2019-04-15T15:29:00Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2019-11236",
@@ -27651,13 +27651,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2023-07-31T20:59:18Z",
             "cwe_ids": [
               "CWE-295"
             ],
-            "github_reviewed_at": "2023-07-31T20:59:18Z",
-            "severity": "MODERATE",
+            "nvd_published_at": "2017-01-11T16:59:00Z",
             "github_reviewed": true,
-            "nvd_published_at": "2017-01-11T16:59:00Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2016-9015",
@@ -27727,13 +27727,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2023-10-02T23:27:05Z",
             "cwe_ids": [
               "CWE-200"
             ],
-            "github_reviewed_at": "2023-10-02T23:27:05Z",
-            "severity": "HIGH",
+            "nvd_published_at": "2023-10-04T17:15:10Z",
             "github_reviewed": true,
-            "nvd_published_at": "2023-10-04T17:15:10Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2023-43804",
@@ -27795,13 +27795,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2021-06-17T22:13:47Z",
             "cwe_ids": [
               "CWE-74"
             ],
-            "github_reviewed_at": "2021-06-17T22:13:47Z",
-            "severity": "MODERATE",
+            "nvd_published_at": "2020-09-30T18:15:00Z",
             "github_reviewed": true,
-            "nvd_published_at": "2020-09-30T18:15:00Z"
+            "severity": "MODERATE"
           },
           "aliases": [
             "CVE-2020-26137",
@@ -27895,13 +27895,13 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2020-06-16T22:01:30Z",
             "cwe_ids": [
               "CWE-200"
             ],
-            "github_reviewed_at": "2020-06-16T22:01:30Z",
-            "severity": "CRITICAL",
+            "nvd_published_at": "2018-12-11T17:29:00Z",
             "github_reviewed": true,
-            "nvd_published_at": "2018-12-11T17:29:00Z"
+            "severity": "CRITICAL"
           },
           "aliases": [
             "CVE-2018-20060",
@@ -28340,7 +28340,7 @@
       "vuln_count": 28,
       "cvss_score": 5.8,
       "severity": "HIGH",
-      "risk_score": 27.09,
+      "risk_score": 27.1,
       "risk_class": "HIGH",
       "fix_available": true,
       "attack_classification": {
@@ -28380,7 +28380,7 @@
         "primary_attack_type": "Unauthorized Access"
       },
       "exposure_score": 8.88,
-      "mean_blast_radius": 1.15,
+      "mean_blast_radius": 1.17,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 5.8 + 28 known vulnerabilities",
@@ -28543,13 +28543,13 @@
             }
           ],
           "database_specific": {
-            "severity": "HIGH",
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-400"
             ],
             "nvd_published_at": null,
-            "github_reviewed_at": "2024-07-16T19:32:22Z",
-            "github_reviewed": true
+            "severity": "HIGH",
+            "github_reviewed_at": "2024-07-16T19:32:22Z"
           },
           "aliases": []
         },
@@ -28584,14 +28584,14 @@
             }
           ],
           "database_specific": {
-            "severity": "CRITICAL",
+            "github_reviewed": true,
             "cwe_ids": [
               "CWE-1395",
               "CWE-190"
             ],
             "nvd_published_at": null,
-            "github_reviewed_at": "2024-07-16T19:32:45Z",
-            "github_reviewed": true
+            "severity": "CRITICAL",
+            "github_reviewed_at": "2024-07-16T19:32:45Z"
           },
           "aliases": []
         }
@@ -28624,7 +28624,7 @@
         "primary_attack_type": "Remote Code Execution"
       },
       "exposure_score": 8.28,
-      "mean_blast_radius": 1.16,
+      "mean_blast_radius": 1.18,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 5.4",
@@ -28701,14 +28701,14 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2026-02-01T18:09:10Z",
             "cwe_ids": [
               "CWE-202",
               "CWE-89"
             ],
+            "nvd_published_at": "2026-01-30T19:16:11Z",
             "github_reviewed": true,
-            "severity": "HIGH",
-            "github_reviewed_at": "2026-02-01T18:09:10Z",
-            "nvd_published_at": "2026-01-30T19:16:11Z"
+            "severity": "HIGH"
           },
           "aliases": [
             "CVE-2025-69662"
@@ -28829,9 +28829,9 @@
           ],
           "database_specific": {
             "github_reviewed": true,
-            "github_reviewed_at": "2026-05-05T20:53:18Z",
             "nvd_published_at": null,
             "severity": "HIGH",
+            "github_reviewed_at": "2026-05-05T20:53:18Z",
             "cwe_ids": [
               "CWE-20",
               "CWE-602",
@@ -28882,11 +28882,11 @@
           ],
           "database_specific": {
             "github_reviewed": true,
+            "nvd_published_at": "2024-01-19T21:15:09Z",
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-200"
             ],
-            "nvd_published_at": "2024-01-19T21:15:09Z",
-            "severity": "HIGH",
             "github_reviewed_at": "2024-01-19T20:28:10Z"
           },
           "aliases": [
@@ -28928,13 +28928,13 @@
           ],
           "database_specific": {
             "github_reviewed": true,
+            "nvd_published_at": "2021-08-09T21:15:00Z",
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-75",
               "CWE-79",
               "CWE-87"
             ],
-            "nvd_published_at": "2021-08-09T21:15:00Z",
-            "severity": "MODERATE",
             "github_reviewed_at": "2021-08-23T16:41:37Z"
           },
           "aliases": [
@@ -28979,11 +28979,11 @@
           ],
           "database_specific": {
             "github_reviewed": true,
+            "nvd_published_at": "2024-01-19T21:15:09Z",
+            "severity": "MODERATE",
             "cwe_ids": [
               "CWE-79"
             ],
-            "nvd_published_at": "2024-01-19T21:15:09Z",
-            "severity": "MODERATE",
             "github_reviewed_at": "2024-01-19T20:24:09Z"
           },
           "aliases": [
@@ -29025,11 +29025,11 @@
           ],
           "database_specific": {
             "github_reviewed": true,
+            "nvd_published_at": "2024-08-28T20:15:07Z",
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-79"
             ],
-            "nvd_published_at": "2024-08-28T20:15:07Z",
-            "severity": "HIGH",
             "github_reviewed_at": "2024-08-29T17:55:53Z"
           },
           "aliases": [
@@ -29063,11 +29063,11 @@
           ],
           "database_specific": {
             "github_reviewed": true,
+            "nvd_published_at": null,
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-79"
             ],
-            "nvd_published_at": null,
-            "severity": "HIGH",
             "github_reviewed_at": "2026-05-06T21:43:44Z"
           },
           "aliases": [
@@ -29102,12 +29102,12 @@
           ],
           "database_specific": {
             "github_reviewed": true,
+            "nvd_published_at": "2026-05-06T20:16:31Z",
+            "severity": "HIGH",
             "cwe_ids": [
               "CWE-601",
               "CWE-79"
             ],
-            "nvd_published_at": "2026-05-06T20:16:31Z",
-            "severity": "HIGH",
             "github_reviewed_at": "2026-04-30T17:25:47Z"
           },
           "aliases": [
@@ -29142,11 +29142,11 @@
           ],
           "database_specific": {
             "github_reviewed": true,
+            "nvd_published_at": "2025-09-26T16:15:48Z",
+            "severity": "LOW",
             "cwe_ids": [
               "CWE-1022"
             ],
-            "nvd_published_at": "2025-09-26T16:15:48Z",
-            "severity": "LOW",
             "github_reviewed_at": "2025-09-26T14:26:40Z"
           },
           "aliases": [
@@ -29292,12 +29292,12 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2026-01-22T18:55:43Z",
             "severity": "HIGH",
             "cwe_ids": [
               "CWE-770"
             ],
             "nvd_published_at": "2026-01-22T17:16:01Z",
-            "github_reviewed_at": "2026-01-22T18:55:43Z",
             "github_reviewed": true
           },
           "aliases": [
@@ -29343,12 +29343,12 @@
             }
           ],
           "database_specific": {
+            "github_reviewed_at": "2024-02-26T21:31:06Z",
             "severity": "HIGH",
             "cwe_ids": [
               "CWE-674"
             ],
             "nvd_published_at": "2024-02-26T16:28:00Z",
-            "github_reviewed_at": "2024-02-26T21:31:06Z",
             "github_reviewed": true
           },
           "aliases": [
@@ -29392,7 +29392,7 @@
       "vuln_count": 3,
       "cvss_score": 3.2,
       "severity": "HIGH",
-      "risk_score": 16.44,
+      "risk_score": 16.43,
       "risk_class": "MEDIUM",
       "fix_available": true,
       "attack_classification": {
@@ -29414,8 +29414,8 @@
         },
         "primary_attack_type": "Sensitive Data Exposure"
       },
-      "exposure_score": 4.98,
-      "mean_blast_radius": 1.12,
+      "exposure_score": 4.97,
+      "mean_blast_radius": 1.09,
       "p95_blast_radius": 2,
       "critical_hit_rate": 0.0,
       "explanation": "CVSS 3.2",
