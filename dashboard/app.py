@@ -1,6 +1,12 @@
+"""
+CascadeGuard Dashboard - Interactive web UI for risk visualization and mitigation planning.
+Built with Streamlit.
+"""
+
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import streamlit as st
 import networkx as nx
 from networkx.readwrite import json_graph
@@ -9,6 +15,14 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from collections import defaultdict
+import logging
+
+from logging_config import setup_logging, get_logger
+from config import get_config
+
+# Setup logging
+setup_logging()
+logger = get_logger(__name__)
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -18,175 +32,418 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ── Theme configuration ────────────────────────────────────────────────────────
+def get_theme_css(is_light: bool) -> str:
+    """Generate CSS based on theme preference."""
+    if is_light:
+        return """
+        <style>
+            /* Light Mode - Professional */
+            [data-testid="stAppViewContainer"] {
+                background: linear-gradient(135deg, #f8f9fa 0%, #f5f7fb 100%);
+                color: #1a1f3a;
+            }
+            [data-testid="stSidebar"] {
+                background: linear-gradient(135deg, #ffffff 0%, #f9fafc 100%);
+                border-right: 1px solid #e0e3e8;
+            }
+            [data-testid="stHeader"] { background: transparent; }
+            [data-testid="stToolbar"] { right: 2rem; }
+
+            /* Metric cards */
+            [data-testid="stMetric"] {
+                background: white;
+                border: 1px solid #e0e3e8;
+                border-radius: 16px;
+                padding: 20px;
+                box-shadow: 0 2px 8px rgba(26, 31, 58, 0.05);
+                transition: all 0.3s ease;
+            }
+            [data-testid="stMetric"]:hover {
+                box-shadow: 0 4px 16px rgba(26, 31, 58, 0.1);
+                border-color: #d0d4db;
+            }
+            [data-testid="stMetricLabel"] { color: #6b7280; font-size: 12px; font-weight: 500; letter-spacing: 0.5px; }
+            [data-testid="stMetricValue"] { color: #1a1f3a; font-size: 32px; font-weight: 700; }
+
+            /* Tabs */
+            .stTabs [data-baseweb="tab-list"] {
+                background: transparent;
+                border-radius: 12px;
+                padding: 0;
+                border-bottom: 2px solid #e0e3e8;
+            }
+            .stTabs [data-baseweb="tab"] {
+                color: #6b7280;
+                border-radius: 8px 8px 0 0;
+                font-weight: 600;
+                padding: 12px 20px !important;
+                transition: all 0.3s ease;
+            }
+            .stTabs [data-baseweb="tab"]:hover {
+                color: #1a1f3a;
+                background: #f0f3f8;
+            }
+            .stTabs [aria-selected="true"] {
+                background: transparent !important;
+                color: #0066cc !important;
+                border-bottom: 3px solid #0066cc !important;
+            }
+
+            /* Buttons */
+            .stButton > button {
+                background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+                color: white;
+                border: none;
+                border-radius: 10px;
+                font-weight: 600;
+                padding: 12px 24px;
+                width: 100%;
+                box-shadow: 0 4px 12px rgba(0, 102, 204, 0.25);
+                transition: all 0.3s ease;
+            }
+            .stButton > button:hover {
+                background: linear-gradient(135deg, #0052a3 0%, #003d7a 100%);
+                box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35);
+                transform: translateY(-2px);
+            }
+
+            /* Text input */
+            .stTextInput > div > div > input {
+                background: white;
+                border: 1.5px solid #e0e3e8;
+                border-radius: 10px;
+                color: #1a1f3a;
+                font-size: 14px;
+                padding: 10px 14px;
+                transition: all 0.3s ease;
+            }
+            .stTextInput > div > div > input:focus {
+                border-color: #0066cc;
+                box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+            }
+
+            /* Section headers */
+            .section-header {
+                font-size: 20px;
+                font-weight: 700;
+                color: #1a1f3a;
+                padding: 8px 0 20px 0;
+                border-bottom: 2px solid #e0e3e8;
+                margin-bottom: 24px;
+                background: linear-gradient(90deg, #1a1f3a 0%, #0066cc 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            /* Risk badges - Light mode */
+            .badge-critical {
+                background: #fee2e2;
+                color: #dc2626;
+                border: 1px solid #fecaca;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+            .badge-high {
+                background: #fed7aa;
+                color: #d97706;
+                border: 1px solid #fdba74;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+            .badge-medium {
+                background: #fef3c7;
+                color: #d97706;
+                border: 1px solid #fde68a;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+            .badge-low {
+                background: #dbeafe;
+                color: #2563eb;
+                border: 1px solid #bfdbfe;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+            .badge-clean {
+                background: #dcfce7;
+                color: #16a34a;
+                border: 1px solid #bbf7d0;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            /* Info card */
+            .info-card {
+                background: white;
+                border: 1px solid #e0e3e8;
+                border-radius: 16px;
+                padding: 24px;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 8px rgba(26, 31, 58, 0.05);
+                transition: all 0.3s ease;
+            }
+            .info-card:hover {
+                box-shadow: 0 4px 16px rgba(26, 31, 58, 0.1);
+                border-color: #d0d4db;
+                transform: translateY(-2px);
+            }
+
+            /* Expander */
+            .streamlit-expanderHeader {
+                background: white !important;
+                border: 1px solid #e0e3e8 !important;
+                border-radius: 10px !important;
+                color: #1a1f3a !important;
+                font-weight: 600 !important;
+            }
+            .streamlit-expanderHeader:hover {
+                background: #f9fafc !important;
+            }
+
+            /* Explanation box */
+            .explanation-box {
+                background: #f0f6ff;
+                border-left: 4px solid #0066cc;
+                padding: 12px 16px;
+                border-radius: 0 8px 8px 0;
+                font-size: 13px;
+                color: #1a1f3a;
+                margin-top: 12px;
+            }
+
+            /* Dataframe */
+            [data-testid="stDataFrame"] {
+                border-radius: 12px;
+                border: 1px solid #e0e3e8;
+                box-shadow: 0 2px 8px rgba(26, 31, 58, 0.05);
+            }
+
+            /* Divider */
+            hr { border-color: #e0e3e8; }
+
+            /* Slider */
+            .stSlider > div > div > div { background: #0066cc; }
+            
+            /* Multi-select */
+            .stMultiSelect > div > div {
+                background: white;
+                border: 1.5px solid #e0e3e8;
+                border-radius: 10px;
+            }
+            
+            /* Select box */
+            .stSelectbox > div > div {
+                background: white;
+                border: 1.5px solid #e0e3e8;
+                border-radius: 10px;
+            }
+        </style>
+        """
+    else:
+        # Dark Mode
+        return """
+        <style>
+            /* Base */
+            [data-testid="stAppViewContainer"] {
+                background: #0d1117;
+                color: #e6edf3;
+            }
+            [data-testid="stSidebar"] {
+                background: #161b22;
+                border-right: 1px solid #30363d;
+            }
+            [data-testid="stHeader"] { background: transparent; }
+
+            /* Metric cards */
+            [data-testid="stMetric"] {
+                background: #161b22;
+                border: 1px solid #30363d;
+                border-radius: 12px;
+                padding: 16px 20px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            }
+            [data-testid="stMetricLabel"] { color: #8b949e; font-size: 13px; }
+            [data-testid="stMetricValue"] { color: #e6edf3; font-size: 28px; }
+
+            /* Tabs */
+            .stTabs [data-baseweb="tab-list"] {
+                background: #161b22;
+                border-radius: 8px;
+                padding: 4px;
+                border: 1px solid #30363d;
+            }
+            .stTabs [data-baseweb="tab"] {
+                color: #8b949e;
+                border-radius: 6px;
+                font-weight: 500;
+            }
+            .stTabs [aria-selected="true"] {
+                background: #21262d !important;
+                color: #e6edf3 !important;
+            }
+
+            /* Buttons */
+            .stButton > button {
+                background: #238636;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-weight: 600;
+                padding: 10px 24px;
+                width: 100%;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+            .stButton > button:hover { background: #2ea043; }
+
+            /* Text input */
+            .stTextInput > div > div > input {
+                background: #21262d;
+                border: 1px solid #30363d;
+                border-radius: 8px;
+                color: #e6edf3;
+                font-size: 14px;
+            }
+
+            /* Section headers */
+            .section-header {
+                font-size: 18px;
+                font-weight: 600;
+                color: #e6edf3;
+                padding: 8px 0 16px 0;
+                border-bottom: 1px solid #30363d;
+                margin-bottom: 20px;
+            }
+
+            /* Risk badges */
+            .badge-critical {
+                background: #ff000033;
+                color: #ff7b72;
+                border: 1px solid #ff7b7255;
+                padding: 2px 10px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+            .badge-high {
+                background: #fd7e1433;
+                color: #f0883e;
+                border: 1px solid #f0883e55;
+                padding: 2px 10px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+            .badge-medium {
+                background: #e3b34133;
+                color: #e3b341;
+                border: 1px solid #e3b34155;
+                padding: 2px 10px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+            .badge-low {
+                background: #1f6feb33;
+                color: #58a6ff;
+                border: 1px solid #58a6ff55;
+                padding: 2px 10px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+            .badge-clean {
+                background: #23863633;
+                color: #3fb950;
+                border: 1px solid #3fb95055;
+                padding: 2px 10px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            /* Info card */
+            .info-card {
+                background: #161b22;
+                border: 1px solid #30363d;
+                border-radius: 12px;
+                padding: 20px;
+                margin-bottom: 16px;
+            }
+
+            /* Expander */
+            .streamlit-expanderHeader {
+                background: #161b22 !important;
+                border: 1px solid #30363d !important;
+                border-radius: 8px !important;
+                color: #e6edf3 !important;
+            }
+
+            /* Explanation box */
+            .explanation-box {
+                background: #1c2128;
+                border-left: 3px solid #58a6ff;
+                padding: 10px 16px;
+                border-radius: 0 8px 8px 0;
+                font-size: 13px;
+                color: #8b949e;
+                margin-top: 8px;
+            }
+
+            /* Dataframe */
+            [data-testid="stDataFrame"] { border-radius: 8px; }
+
+            /* Divider */
+            hr { border-color: #30363d; }
+
+            /* Slider */
+            .stSlider > div > div > div { background: #238636; }
+        </style>
+        """
+
+# ── Theme state initialization ────────────────────────────────────────────────
+if "theme" not in st.session_state:
+    st.session_state.theme = "light"  # Default to light mode
+
 # ── Custom CSS ────────────────────────────────────────────────────────────────
-st.markdown("""
-<style>
-    /* Base */
-    [data-testid="stAppViewContainer"] {
-        background: #0d1117;
-        color: #e6edf3;
-    }
-    [data-testid="stSidebar"] {
-        background: #161b22;
-        border-right: 1px solid #30363d;
-    }
-    [data-testid="stHeader"] { background: transparent; }
-
-    /* Metric cards */
-    [data-testid="stMetric"] {
-        background: #161b22;
-        border: 1px solid #30363d;
-        border-radius: 12px;
-        padding: 16px 20px;
-    }
-    [data-testid="stMetricLabel"] { color: #8b949e; font-size: 13px; }
-    [data-testid="stMetricValue"] { color: #e6edf3; font-size: 28px; }
-
-    /* Tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        background: #161b22;
-        border-radius: 8px;
-        padding: 4px;
-        border: 1px solid #30363d;
-    }
-    .stTabs [data-baseweb="tab"] {
-        color: #8b949e;
-        border-radius: 6px;
-        font-weight: 500;
-    }
-    .stTabs [aria-selected="true"] {
-        background: #21262d !important;
-        color: #e6edf3 !important;
-    }
-
-    /* Buttons */
-    .stButton > button {
-        background: #238636;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        padding: 10px 24px;
-        width: 100%;
-    }
-    .stButton > button:hover { background: #2ea043; }
-
-    /* Text input */
-    .stTextInput > div > div > input {
-        background: #21262d;
-        border: 1px solid #30363d;
-        border-radius: 8px;
-        color: #e6edf3;
-        font-size: 14px;
-    }
-
-    /* Section headers */
-    .section-header {
-        font-size: 18px;
-        font-weight: 600;
-        color: #e6edf3;
-        padding: 8px 0 16px 0;
-        border-bottom: 1px solid #30363d;
-        margin-bottom: 20px;
-    }
-
-    /* Risk badges */
-    .badge-critical {
-        background: #ff000033;
-        color: #ff7b72;
-        border: 1px solid #ff7b7255;
-        padding: 2px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    .badge-high {
-        background: #fd7e1433;
-        color: #f0883e;
-        border: 1px solid #f0883e55;
-        padding: 2px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    .badge-medium {
-        background: #e3b34133;
-        color: #e3b341;
-        border: 1px solid #e3b34155;
-        padding: 2px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    .badge-low {
-        background: #1f6feb33;
-        color: #58a6ff;
-        border: 1px solid #58a6ff55;
-        padding: 2px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    .badge-clean {
-        background: #23863633;
-        color: #3fb950;
-        border: 1px solid #3fb95055;
-        padding: 2px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    /* Info card */
-    .info-card {
-        background: #161b22;
-        border: 1px solid #30363d;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 16px;
-    }
-
-    /* Expander */
-    .streamlit-expanderHeader {
-        background: #161b22 !important;
-        border: 1px solid #30363d !important;
-        border-radius: 8px !important;
-        color: #e6edf3 !important;
-    }
-
-    /* Explanation box */
-    .explanation-box {
-        background: #1c2128;
-        border-left: 3px solid #58a6ff;
-        padding: 10px 16px;
-        border-radius: 0 8px 8px 0;
-        font-size: 13px;
-        color: #8b949e;
-        margin-top: 8px;
-    }
-
-    /* Dataframe */
-    [data-testid="stDataFrame"] { border-radius: 8px; }
-
-    /* Divider */
-    hr { border-color: #30363d; }
-
-    /* Slider */
-    .stSlider > div > div > div { background: #238636; }
-</style>
-""", unsafe_allow_html=True)
+st.markdown(get_theme_css(st.session_state.theme == "light"), unsafe_allow_html=True)
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-RISK_COLORS = {
-    "CRITICAL": "#ff7b72",
-    "HIGH":     "#f0883e",
-    "MEDIUM":   "#e3b341",
-    "LOW":      "#58a6ff",
-    "CLEAN":    "#3fb950",
-    "UNKNOWN":  "#8b949e",
-}
+def get_risk_colors(is_light: bool) -> dict:
+    """Return risk colors based on theme."""
+    if is_light:
+        return {
+            "CRITICAL": "#dc2626",
+            "HIGH":     "#d97706",
+            "MEDIUM":   "#f59e0b",
+            "LOW":      "#2563eb",
+            "CLEAN":    "#16a34a",
+            "UNKNOWN":  "#6b7280",
+        }
+    else:
+        return {
+            "CRITICAL": "#ff7b72",
+            "HIGH":     "#f0883e",
+            "MEDIUM":   "#e3b341",
+            "LOW":      "#58a6ff",
+            "CLEAN":    "#3fb950",
+            "UNKNOWN":  "#8b949e",
+        }
+
+RISK_COLORS = get_risk_colors(st.session_state.theme == "light")
 
 def badge(risk_class: str) -> str:
     cls = risk_class.lower() if risk_class else "clean"
@@ -205,49 +462,108 @@ def load_json(path: str) -> dict | None:
     with open(path) as f:
         return json.load(f)
 
-def run_pipeline(github_url: str, progress_bar, status_text) -> nx.DiGraph:
-    """Runs the full CascadeGuard pipeline and returns the enriched graph."""
+def run_pipeline(github_url: str, progress_bar, status_text):
+    """Runs the full CascadeGuard pipeline including new attack classification and impact analysis."""
     from ingestion.ingestion_runner import ingest
+    from ingestion.github_client import parse_github_url, get_file_tree, get_file_content
     from graph.graph_builder import build_graph
-    from risk.enricher import enrich_graph, export_enriched_graph
-    from risk.enricher import rescore_after_simulation
+    from risk.enricher import enrich_graph, export_enriched_graph, rescore_after_simulation, _build_explanation
     from simulation.simulation_runner import run_full_simulation
     from optimizer.optimizer_runner import run_optimization
+    from impact.ast_scanner import scan_repository
+    from impact.impact_mapper import map_impact
+    from risk.narrative_generator import generate_full_narrative
 
     repo_name = github_url.rstrip("/").split("github.com/")[-1]
 
-    status_text.text("📦 Step 1/5 — Fetching repository & parsing dependencies...")
+    status_text.text("📦 Step 1/8 — Fetching repository & parsing dependencies...")
     progress_bar.progress(10)
     packages = ingest(github_url)
 
-    status_text.text("🕸️ Step 2/5 — Building dependency graph...")
-    progress_bar.progress(30)
+    status_text.text("🕸️ Step 2/8 — Building dependency graph...")
+    progress_bar.progress(15)
     G = build_graph(packages, repo_name=repo_name, max_depth=3)
 
-    status_text.text("🔍 Step 3/5 — Querying vulnerability databases...")
-    progress_bar.progress(50)
+    status_text.text("🔍 Step 3/8 — Querying vulnerability databases...")
+    progress_bar.progress(30)
     G = enrich_graph(G)
 
-    status_text.text("🎲 Step 4/5 — Running Monte Carlo simulations...")
-    progress_bar.progress(70)
+    status_text.text("🎲 Step 4/8 — Running Monte Carlo simulations...")
+    progress_bar.progress(50)
     results = run_full_simulation(G, n_simulations=1000)
     G = rescore_after_simulation(G, results)
 
     for node, data in G.nodes(data=True):
         if data.get("ecosystem") != "root":
-            from risk.enricher import _build_explanation
             sim = results.get(node, {})
             G.nodes[node]["explanation"] = _build_explanation(node, data, sim)
 
-    status_text.text("⚡ Step 5/5 — Optimizing mitigation plan...")
+    status_text.text("📂 Step 5/8 — Fetching source files from repository...")
+    progress_bar.progress(60)
+    try:
+        owner, repo = parse_github_url(github_url)
+        file_tree = get_file_tree(owner, repo)
+        
+        # Filter for source files
+        extensions = {".py", ".js", ".ts", ".jsx", ".tsx"}
+        excluded_dirs = {"node_modules", "vendor", ".git", "__pycache__", ".tox", "venv", ".venv",
+                        "env", "dist", "build", "target", ".gradle", "examples", "test", "tests",
+                        "fixtures", "docs", "doc", ".github", "site", "benchmark", "benchmarks"}
+        
+        source_files = {}
+        for path in file_tree:
+            if not any(path.endswith(ext) for ext in extensions):
+                continue
+            if any(part in excluded_dirs for part in path.split("/")[:-1]):
+                continue
+            try:
+                content = get_file_content(owner, repo, path)
+                source_files[path] = content
+            except Exception as e:
+                logger.warning(f"Failed to fetch {path}: {e}")
+    except Exception as e:
+        logger.warning(f"Could not fetch source files: {e}")
+        source_files = {}
+
+    status_text.text("🔎 Step 6/8 — Scanning source code for imports...")
+    progress_bar.progress(70)
+    if source_files:
+        scan_results = scan_repository(source_files)
+    else:
+        scan_results = {}
+
+    status_text.text("🎯 Step 7/8 — Mapping vulnerability impact to source files...")
+    progress_bar.progress(80)
+    impact_map = map_impact(G, scan_results)
+    
+    # Attach impact data to nodes (keys in impact_map are node IDs matching graph nodes)
+    for impact_node_id, impact_data in impact_map.items():
+        if impact_node_id in G.nodes():
+            G.nodes[impact_node_id]["impact_data"] = impact_data
+
+    status_text.text("📝 Step 8/8 — Generating risk narratives...")
     progress_bar.progress(90)
+    narratives = []
+    for node, data in G.nodes(data=True):
+        if data.get("ecosystem") != "root" and data.get("risk_class") in ["CRITICAL", "HIGH"]:
+            try:
+                narrative = generate_full_narrative(node, data, impact_map, 
+                                                   data.get("risk_score", 0), 
+                                                   data.get("risk_class", ""))
+                narratives.append(narrative)
+                G.nodes[node]["narrative"] = narrative
+            except Exception as e:
+                logger.warning(f"Failed to generate narrative for {node}: {e}")
+
+    status_text.text("⚡ Optimizing mitigation plan...")
+    progress_bar.progress(95)
     export_enriched_graph(G)
     run_optimization(G, results)
 
     progress_bar.progress(100)
     status_text.text("✅ Analysis complete.")
 
-    return G, results
+    return G, results, impact_map, narratives, scan_results
 
 def get_node_df(G: nx.DiGraph) -> pd.DataFrame:
     """Converts graph nodes to a clean DataFrame for display."""
@@ -278,12 +594,25 @@ def get_node_df(G: nx.DiGraph) -> pd.DataFrame:
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 
 with st.sidebar:
+    # Theme toggle
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("☀️  Light", key="light_btn", use_container_width=True):
+            st.session_state.theme = "light"
+            st.rerun()
+    with col2:
+        if st.button("🌙 Dark", key="dark_btn", use_container_width=True):
+            st.session_state.theme = "dark"
+            st.rerun()
+    
+    st.markdown("---")
+    
     st.markdown("""
     <div style="padding: 8px 0 24px 0;">
-        <div style="font-size:24px; font-weight:700; color:#e6edf3;">
+        <div style="font-size:24px; font-weight:700; {% if is_light %}color:#1a1f3a;{% else %}color:#e6edf3;{% endif %}">
             🛡️ CascadeGuard
         </div>
-        <div style="font-size:12px; color:#8b949e; margin-top:4px;">
+        <div style="font-size:12px; {% if is_light %}color:#6b7280;{% else %}color:#8b949e;{% endif %} margin-top:4px;">
             Supply Chain Risk Intelligence
         </div>
     </div>
@@ -310,12 +639,12 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("""
-    <div style="font-size:11px; color:#8b949e; line-height:1.6;">
-        <b style="color:#e6edf3">Data sources</b><br>
+    <div style="font-size:11px; {% if is_light %}color:#6b7280;{% else %}color:#8b949e;{% endif %} line-height:1.6;">
+        <b style="{% if is_light %}color:#1a1f3a;{% else %}color:#e6edf3;{% endif %}">Data sources</b><br>
         GitHub REST API<br>
         OSV Vulnerability DB<br>
         PyPI · npm · Maven Central<br><br>
-        <b style="color:#e6edf3">Analysis</b><br>
+        <b style="{% if is_light %}color:#1a1f3a;{% else %}color:#e6edf3;{% endif %}">Analysis</b><br>
         Monte Carlo Simulation<br>
         0/1 Knapsack Optimization<br>
         PageRank Centrality
@@ -331,6 +660,12 @@ if "sim_results" not in st.session_state:
     st.session_state.sim_results = None
 if "repo_name" not in st.session_state:
     st.session_state.repo_name = None
+if "impact_map" not in st.session_state:
+    st.session_state.impact_map = {}
+if "narratives" not in st.session_state:
+    st.session_state.narratives = []
+if "scan_results" not in st.session_state:
+    st.session_state.scan_results = {}
 
 
 # ── Pipeline trigger ──────────────────────────────────────────────────────────
@@ -339,10 +674,13 @@ if run_live and github_url:
     with st.spinner(""):
         progress_bar = st.progress(0)
         status_text  = st.empty()
-        G, results   = run_pipeline(github_url, progress_bar, status_text)
-        st.session_state.G           = G
-        st.session_state.sim_results = results
-        st.session_state.repo_name   = github_url.split("github.com/")[-1].rstrip("/")
+        G, results, impact_map, narratives, scan_results = run_pipeline(github_url, progress_bar, status_text)
+        st.session_state.G              = G
+        st.session_state.sim_results    = results
+        st.session_state.repo_name      = github_url.split("github.com/")[-1].rstrip("/")
+        st.session_state.impact_map     = impact_map
+        st.session_state.narratives     = narratives
+        st.session_state.scan_results   = scan_results
         st.rerun()
 
 elif load_cached:
@@ -354,6 +692,21 @@ elif load_cached:
             k: v for k, v in results.items() if k != "__summary__"
         }
         st.session_state.repo_name   = "cached results"
+        
+        # Reconstruct impact_map from graph nodes
+        impact_map = {}
+        for node, data in G.nodes(data=True):
+            if data.get("impact_data"):
+                impact_map[node] = data.get("impact_data")
+        st.session_state.impact_map = impact_map
+        
+        # Reconstruct narratives from graph nodes
+        narratives = []
+        for node, data in G.nodes(data=True):
+            if data.get("narrative") and data.get("risk_class") in ["CRITICAL", "HIGH"]:
+                narratives.append(data.get("narrative"))
+        st.session_state.narratives = narratives
+        
         st.success("Loaded cached results.")
     else:
         st.error("No cached results found. Run a live analysis first.")
@@ -362,16 +715,19 @@ elif load_cached:
 # ── Landing screen ────────────────────────────────────────────────────────────
 
 if st.session_state.G is None:
-    st.markdown("""
+    is_light = st.session_state.theme == "light"
+    RISK_COLORS = get_risk_colors(is_light)
+    
+    st.markdown(f"""
     <div style="text-align:center; padding: 80px 0 40px 0;">
         <div style="font-size:64px;">🛡️</div>
-        <div style="font-size:36px; font-weight:700; color:#e6edf3; margin-top:16px;">
+        <div style="font-size:36px; font-weight:700; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:16px;">
             CascadeGuard
         </div>
-        <div style="font-size:18px; color:#8b949e; margin-top:8px;">
+        <div style="font-size:18px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:8px;">
             Zero-Trust Software Supply Chain Risk Intelligence
         </div>
-        <div style="font-size:14px; color:#8b949e; margin-top:24px; max-width:560px;
+        <div style="font-size:14px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:24px; max-width:560px;
                     margin-left:auto; margin-right:auto; line-height:1.8;">
             Enter a GitHub repository URL in the sidebar to analyze its full
             dependency graph, detect vulnerabilities, simulate attack propagation,
@@ -382,39 +738,39 @@ if st.session_state.G is None:
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.markdown("""
+        st.markdown(f"""
         <div class="info-card">
             <div style="font-size:28px;">🕸️</div>
-            <div style="font-weight:600; color:#e6edf3; margin-top:8px;">
+            <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">
                 Graph Analysis
             </div>
-            <div style="font-size:13px; color:#8b949e; margin-top:6px;">
+            <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
                 Builds a full dependency graph up to 3 levels deep across
                 PyPI, npm, and Maven ecosystems.
             </div>
         </div>
         """, unsafe_allow_html=True)
     with c2:
-        st.markdown("""
+        st.markdown(f"""
         <div class="info-card">
             <div style="font-size:28px;">🎲</div>
-            <div style="font-weight:600; color:#e6edf3; margin-top:8px;">
+            <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">
                 Monte Carlo Simulation
             </div>
-            <div style="font-size:13px; color:#8b949e; margin-top:6px;">
+            <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
                 Runs 1000 attack propagation simulations per vulnerable node
                 to estimate real-world blast radius probabilities.
             </div>
         </div>
         """, unsafe_allow_html=True)
     with c3:
-        st.markdown("""
+        st.markdown(f"""
         <div class="info-card">
             <div style="font-size:28px;">⚡</div>
-            <div style="font-weight:600; color:#e6edf3; margin-top:8px;">
+            <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'}; margin-top:8px;">
                 Smart Prioritization
             </div>
-            <div style="font-size:13px; color:#8b949e; margin-top:6px;">
+            <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:6px;">
                 Knapsack optimization selects the highest-value fixes within
                 your engineering budget — not just highest CVSS.
             </div>
@@ -425,6 +781,10 @@ if st.session_state.G is None:
 
 # ── Main dashboard ────────────────────────────────────────────────────────────
 
+# Update risk colors based on current theme
+is_light = st.session_state.theme == "light"
+RISK_COLORS = get_risk_colors(is_light)
+
 G       = st.session_state.G
 results = st.session_state.sim_results or {}
 df      = get_node_df(G)
@@ -432,12 +792,12 @@ df      = get_node_df(G)
 # Header
 st.markdown(f"""
 <div style="display:flex; align-items:center; justify-content:space-between;
-            padding:0 0 20px 0; border-bottom:1px solid #30363d; margin-bottom:24px;">
+            padding:0 0 20px 0; border-bottom:{'2px solid #e0e3e8' if is_light else '1px solid #30363d'}; margin-bottom:24px;">
     <div>
-        <div style="font-size:22px; font-weight:700; color:#e6edf3;">
+        <div style="font-size:22px; font-weight:700; color:{'#1a1f3a' if is_light else '#e6edf3'};">
             🛡️ CascadeGuard
         </div>
-        <div style="font-size:13px; color:#8b949e; margin-top:2px;">
+        <div style="font-size:13px; color:{'#6b7280' if is_light else '#8b949e'}; margin-top:2px;">
             {st.session_state.repo_name}
         </div>
     </div>
@@ -463,12 +823,14 @@ k6.metric("Fixable Now",         fixable)
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "📊  Overview",
     "🕸️  Dependency Graph",
     "🎲  Simulation",
     "⚡  Mitigation Plan",
     "🔍  Package Details",
+    "🛡️  Attack Classification",
+    "💥  Module Impact",
 ])
 
 
@@ -499,7 +861,7 @@ with tab1:
             hole=0.65,
             marker_colors=colors,
             textinfo="label+value",
-            textfont=dict(color="#e6edf3", size=13),
+            textfont=dict(color='#1a1f3a' if is_light else '#e6edf3', size=13),
             hovertemplate="<b>%{label}</b><br>%{value} packages<extra></extra>"
         ))
         fig_donut.update_layout(
@@ -511,7 +873,7 @@ with tab1:
             annotations=[dict(
                 text=f"<b>{vulnerable}</b><br>vulnerable",
                 x=0.5, y=0.5,
-                font=dict(color="#e6edf3", size=16),
+                font=dict(color='#1a1f3a' if is_light else '#e6edf3', size=16),
                 showarrow=False
             )]
         )
@@ -533,7 +895,7 @@ with tab1:
                 ),
                 text=top10["risk_score"].round(1),
                 textposition="outside",
-                textfont=dict(color="#e6edf3", size=11),
+                textfont=dict(color='#1a1f3a' if is_light else '#e6edf3', size=11),
                 hovertemplate=(
                     "<b>%{y}</b><br>"
                     "Risk Score: %{x:.1f}<br>"
@@ -545,12 +907,12 @@ with tab1:
                 plot_bgcolor ="rgba(0,0,0,0)",
                 xaxis=dict(
                     showgrid=True,
-                    gridcolor="#30363d",
-                    color="#8b949e",
+                    gridcolor='#e0e3e8' if is_light else '#30363d',
+                    color='#6b7280' if is_light else '#8b949e',
                     range=[0, top10["risk_score"].max() * 1.2]
                 ),
                 yaxis=dict(
-                    color="#e6edf3",
+                    color='#1a1f3a' if is_light else '#e6edf3',
                     autorange="reversed"
                 ),
                 margin=dict(t=10, b=10, l=10, r=60),
@@ -572,20 +934,20 @@ with tab1:
             st.markdown(f"""
             <div class="info-card">
                 <div style="font-size:15px; font-weight:600;
-                            color:#e6edf3;">{label}</div>
+                            color:{'#1a1f3a' if is_light else '#e6edf3'};">{label}</div>
                 <div style="margin-top:12px; display:flex;
                             justify-content:space-between;">
                     <div>
                         <div style="font-size:24px; font-weight:700;
-                                    color:#e6edf3;">{len(eco_df)}</div>
+                                    color:{'#1a1f3a' if is_light else '#e6edf3'};">{len(eco_df)}</div>
                         <div style="font-size:12px;
-                                    color:#8b949e;">packages</div>
+                                    color:{'#6b7280' if is_light else '#8b949e'};">packages</div>
                     </div>
                     <div>
                         <div style="font-size:24px; font-weight:700;
-                                    color:#ff7b72;">{vuln_eco}</div>
+                                    color:{'#dc2626' if is_light else '#ff7b72'};">{vuln_eco}</div>
                         <div style="font-size:12px;
-                                    color:#8b949e;">vulnerable</div>
+                                    color:{'#6b7280' if is_light else '#8b949e'};">vulnerable</div>
                     </div>
                 </div>
             </div>
@@ -605,7 +967,8 @@ with tab2:
 
         net = Network(
             height="600px", width="100%",
-            bgcolor="#0d1117", font_color="#e6edf3",
+            bgcolor='#f8f9fa' if is_light else '#0d1117', 
+            font_color='#1a1f3a' if is_light else '#e6edf3',
             directed=True
         )
         net.barnes_hut(
@@ -641,7 +1004,7 @@ with tab2:
             )
 
         for src, tgt in G.edges():
-            net.add_edge(src, tgt, color="#30363d", arrows="to", width=0.8)
+            net.add_edge(src, tgt, color='#e0e3e8' if is_light else '#30363d', arrows="to", width=0.8)
 
         os.makedirs("output", exist_ok=True)
         net.save_graph("output/graph_vis.html")
@@ -667,18 +1030,18 @@ with tab2:
         fig_g = go.Figure()
         fig_g.add_trace(go.Scatter(
             x=edge_x, y=edge_y, mode="lines",
-            line=dict(color="#30363d", width=0.8), hoverinfo="none"
+            line=dict(color='#e0e3e8' if is_light else '#30363d', width=0.8), hoverinfo="none"
         ))
         fig_g.add_trace(go.Scatter(
             x=node_x, y=node_y, mode="markers+text",
             marker=dict(color=node_colors, size=10),
             text=[n.split(":")[-1] for n in G.nodes()],
-            textfont=dict(color="#e6edf3", size=9),
+            textfont=dict(color='#1a1f3a' if is_light else '#e6edf3', size=9),
             textposition="top center"
         ))
         fig_g.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="#0d1117",
+            plot_bgcolor='#f8f9fa' if is_light else '#0d1117',
             showlegend=False, height=500,
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
             yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
@@ -728,7 +1091,7 @@ with tab3:
         # ── Origin node selector ──────────────────────────────────────────
         st.markdown("### 🎯 Blast Radius Animator")
         st.markdown(
-            "<div style='color:#8b949e; font-size:13px; margin-bottom:16px;'>"
+            f"<div style='color:{'#1a1f3a' if is_light else '#8b949e'}; font-size:13px; margin-bottom:16px;'>"
             "Select an attack origin to animate how compromise spreads "
             "through the dependency graph in real time."
             "</div>",
@@ -800,7 +1163,7 @@ with tab3:
                     return RISK_COLORS.get(rc, "#ff7b72")
                 eco = G.nodes[n].get("ecosystem", "")
                 if eco == "root":       return "#58a6ff"
-                return "#21262d"
+                return "#b0b8c1" if is_light else "#21262d"
 
             def get_node_size(n, revealed_set):
                 base = 12 + G.nodes[n].get("pagerank", 0) * 800
@@ -826,7 +1189,7 @@ with tab3:
 
             edge_trace = go.Scatter(
                 x=edge_x, y=edge_y, mode="lines",
-                line=dict(color="#30363d", width=0.8),
+                line=dict(color="#4b5563" if is_light else "#30363d", width=0.8),
                 hoverinfo="none", showlegend=False
             )
 
@@ -1092,7 +1455,7 @@ with tab3:
                 ),
                 text=sim_df["exposure_score"].round(1),
                 textposition="outside",
-                textfont=dict(color="#e6edf3", size=11),
+                textfont=dict(color='#1a1f3a' if is_light else '#e6edf3', size=11),
                 hovertemplate=(
                     "<b>%{y}</b><br>Exposure: %{x:.1f}<extra></extra>"
                 )
@@ -1100,9 +1463,9 @@ with tab3:
             fig_exp.update_layout(
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor ="rgba(0,0,0,0)",
-                xaxis=dict(showgrid=True, gridcolor="#30363d",
-                           color="#8b949e"),
-                yaxis=dict(color="#e6edf3", autorange="reversed"),
+                xaxis=dict(showgrid=True, gridcolor='#e0e3e8' if is_light else '#30363d',
+                           color='#6b7280' if is_light else '#8b949e'),
+                yaxis=dict(color='#1a1f3a' if is_light else '#e6edf3', autorange="reversed"),
                 margin=dict(t=10, b=10, l=10, r=60),
                 height=350,
             )
@@ -1129,12 +1492,12 @@ with tab3:
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor ="rgba(0,0,0,0)",
                 barmode="group",
-                xaxis=dict(showgrid=False, color="#8b949e",
+                xaxis=dict(showgrid=False, color='#6b7280' if is_light else '#8b949e',
                            tickangle=-30),
-                yaxis=dict(showgrid=True, gridcolor="#30363d",
-                           color="#8b949e",
+                yaxis=dict(showgrid=True, gridcolor='#e0e3e8' if is_light else '#30363d',
+                           color='#6b7280' if is_light else '#8b949e',
                            title="Nodes affected"),
-                legend=dict(font=dict(color="#e6edf3")),
+                legend=dict(font=dict(color='#1a1f3a' if is_light else '#e6edf3')),
                 margin=dict(t=10, b=60, l=10, r=10),
                 height=350,
             )
@@ -1159,12 +1522,12 @@ with tab3:
         )
         fig_scatter.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="#161b22",
-            xaxis=dict(showgrid=True, gridcolor="#30363d",
-                       color="#8b949e"),
-            yaxis=dict(showgrid=True, gridcolor="#30363d",
-                       color="#8b949e"),
-            legend=dict(font=dict(color="#e6edf3"),
+            plot_bgcolor='#f8f9fa' if is_light else '#161b22',
+            xaxis=dict(showgrid=True, gridcolor='#e0e3e8' if is_light else '#30363d',
+                       color='#6b7280' if is_light else '#8b949e'),
+            yaxis=dict(showgrid=True, gridcolor='#e0e3e8' if is_light else '#30363d',
+                       color='#6b7280' if is_light else '#8b949e'),
+            legend=dict(font=dict(color='#1a1f3a' if is_light else '#e6edf3'),
                         bgcolor="rgba(0,0,0,0)"),
             height=350,
         )
@@ -1243,14 +1606,14 @@ with tab4:
                                 align-items:center;">
                         <div style="display:flex; align-items:center; gap:12px;">
                             <div style="font-size:18px; font-weight:700;
-                                        color:#8b949e; min-width:28px;">
+                                        color:{'#6b7280' if is_light else '#8b949e'}; min-width:28px;">
                                 #{i}
                             </div>
                             <div>
-                                <div style="font-weight:600; color:#e6edf3;">
+                                <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'};">
                                     {pkg_name}
                                 </div>
-                                <div style="font-size:12px; color:#8b949e;">
+                                <div style="font-size:12px; color:{'#6b7280' if is_light else '#8b949e'};">
                                     {node} · v{item.get('version','—')}
                                 </div>
                             </div>
@@ -1258,24 +1621,24 @@ with tab4:
                         <div style="display:flex; gap:12px; align-items:center;">
                             {badge(rc)}
                             <div style="text-align:right;">
-                                <div style="font-size:12px; color:#8b949e;">
+                                <div style="font-size:12px; color:{'#6b7280' if is_light else '#8b949e'};">
                                     CVSS</div>
                                 <div style="font-weight:600;
-                                            color:{RISK_COLORS.get(rc,'#8b949e')};">
+                                            color:{RISK_COLORS.get(rc,'#6b7280' if is_light else '#8b949e')};">
                                     {item.get('cvss_score',0):.1f}
                                 </div>
                             </div>
                             <div style="text-align:right;">
-                                <div style="font-size:12px; color:#8b949e;">
+                                <div style="font-size:12px; color:{'#6b7280' if is_light else '#8b949e'};">
                                     Cost</div>
-                                <div style="font-weight:600; color:#e6edf3;">
+                                <div style="font-weight:600; color:{'#1a1f3a' if is_light else '#e6edf3'};">
                                     {item.get('cost_hours',0):.1f}h
                                 </div>
                             </div>
                             <div style="text-align:right;">
                                 <div style="font-size:12px;
-                                            color:#8b949e;">Fix version</div>
-                                <div style="font-weight:600; color:#3fb950;">
+                                            color:{'#6b7280' if is_light else '#8b949e'};">Fix version</div>
+                                <div style="font-weight:600; color:{'#059669' if is_light else '#3fb950'};">
                                     {fix_ver}
                                 </div>
                             </div>
@@ -1326,19 +1689,20 @@ with tab4:
         )
         fig_eff.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="#161b22",
+            plot_bgcolor='#f8f9fa' if is_light else '#161b22',
             xaxis=dict(
                 title="Budget (hours)",
-                showgrid=True, gridcolor="#30363d",
-                color="#8b949e"
+                showgrid=True, gridcolor='#e0e3e8' if is_light else '#30363d',
+                color='#6b7280' if is_light else '#8b949e'
             ),
             yaxis=dict(
                 title="Risk Reduction (%)",
-                showgrid=True, gridcolor="#30363d",
-                color="#8b949e", range=[0, 105]
+                showgrid=True, gridcolor='#e0e3e8' if is_light else '#30363d',
+                color='#6b7280' if is_light else '#8b949e', range=[0, 105]
             ),
             height=300,
             margin=dict(t=10, b=40, l=10, r=10),
+            font=dict(color='#1a1f3a' if is_light else '#e6edf3')
         )
         st.plotly_chart(fig_eff, use_container_width=True)
 
@@ -1407,8 +1771,15 @@ with tab5:
                 for v in vulns:
                     color = RISK_COLORS.get(v.get("severity", ""), "#8b949e")
                     fix   = v.get("fixed_in") or "No fix available"
+                    
+                    bg_color = "#f3f4f6" if is_light else "#1c2128"
+                    border_color = "#d1d5db" if is_light else "#30363d"
+                    text_gray = "#6b7280" if is_light else "#8b949e"
+                    fix_color = "#059669" if is_light else "#3fb950"
+                    link_color = "#2563eb" if is_light else "#58a6ff"
+                    
                     st.markdown(f"""
-                    <div style="background:#1c2128; border:1px solid #30363d;
+                    <div style="background:{bg_color}; border:1px solid {border_color};
                                 border-radius:8px; padding:12px 16px;
                                 margin-bottom:8px;">
                         <div style="display:flex; justify-content:space-between;
@@ -1418,31 +1789,295 @@ with tab5:
                                              color:{color};">
                                     {v.get('display_id','—')}
                                 </span>
-                                <span style="font-size:12px; color:#8b949e;
+                                <span style="font-size:12px; color:{text_gray};
                                              margin-left:10px;">
                                     CVSS {v.get('cvss_score',0):.1f}
                                 </span>
                             </div>
                             <div style="font-size:12px;">
-                                <span style="color:#3fb950;">
+                                <span style="color:{fix_color};">
                                     Fix: {fix}
                                 </span>
                                 <a href="{v.get('detail_url','#')}"
                                    target="_blank"
-                                   style="color:#58a6ff; margin-left:12px;
+                                   style="color:{link_color}; margin-left:12px;
                                           text-decoration:none;">
                                     View ↗
                                 </a>
                             </div>
                         </div>
-                        <div style="font-size:13px; color:#8b949e; margin-top:6px;">
+                        <div style="font-size:13px; color:{text_gray}; margin-top:6px;">
                             {v.get('summary','—')}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
             else:
+                clean_color = "#059669" if is_light else "#3fb950"
                 st.markdown(
-                    '<div style="color:#3fb950; font-size:13px;">'
+                    f'<div style="color:{clean_color}; font-size:13px;">'
                     '✅ No known vulnerabilities</div>',
                     unsafe_allow_html=True
                 )
+
+with tab6:
+    st.markdown('<div class="section-header">🛡️ Attack Classification</div>',
+                unsafe_allow_html=True)
+
+    if st.session_state.G is None:
+        st.info("⚠️ Run the pipeline first to analyze attack patterns.")
+    else:
+        # Get unique packages with attack classifications
+        attack_packages = []
+        for node in st.session_state.G.nodes():
+            if st.session_state.G.nodes[node].get("attack_classification"):
+                package_name = node.split(":")[1] if ":" in node else node
+                attack_packages.append({
+                    "node": node,
+                    "package": package_name,
+                    "display_name": f"{package_name} ({node.split(':')[0].upper()})" if ":" in node else package_name,
+                    "attack_info": st.session_state.G.nodes[node]["attack_classification"]
+                })
+
+        if not attack_packages:
+            st.info("No attack classifications available.")
+        else:
+            # Package selector - show both package name and ecosystem
+            package_options = [p["package"] for p in attack_packages]
+            display_names = [p["display_name"] for p in attack_packages]
+            
+            selected_pkg_idx = st.selectbox(
+                "Select a package to view attack details:",
+                options=range(len(attack_packages)),
+                format_func=lambda i: display_names[i]
+            )
+
+            if 0 <= selected_pkg_idx < len(attack_packages):
+                p = attack_packages[selected_pkg_idx]
+                pkg_node = p["node"]
+                attack_info = p["attack_info"]
+
+                if pkg_node and attack_info:
+                    # Display attack information
+                    ac1, ac2, ac3 = st.columns(3)
+                    with ac1:
+                        primary_attack = attack_info.get("primary_attack_type", attack_info.get("primary_attack", "Unknown"))
+                        st.markdown(f"""
+                        <div class="metric-card">
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
+                                PRIMARY ATTACK TYPE
+                            </div>
+                            <div style="font-size:18px; font-weight:700; color:#f85149; margin-top:8px;">
+                                {primary_attack if primary_attack != "Unknown Attack Type" else "No CWE Match"}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    with ac2:
+                        attacker_cap = attack_info.get("attacker_capability", "Unknown")
+                        st.markdown(f"""
+                        <div class="metric-card">
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
+                                ATTACKER CAPABILITY
+                            </div>
+                            <div style="font-size:14px; font-weight:700; margin-top:8px; word-wrap:break-word;">
+                                {attacker_cap}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    with ac3:
+                        num_cwes = len(attack_info.get("cwe_ids", []))
+                        st.markdown(f"""
+                        <div class="metric-card">
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
+                                RELATED CWEs
+                            </div>
+                            <div style="font-size:20px; font-weight:700; color:#79c0ff; margin-top:8px;">
+                                {num_cwes}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    st.markdown("---")
+
+                    # Display CWE details
+                    if attack_info.get("cwe_ids"):
+                        st.markdown("**Related CWE Vulnerabilities**")
+                        cwe_descriptions = attack_info.get("cwe_descriptions", {})
+                        for cwe_id in attack_info.get("cwe_ids", []):
+                            cwe_description = cwe_descriptions.get(cwe_id, "No description")
+                            st.markdown(f"""
+                            <div style="background:#0d1117; border:1px solid #30363d; border-radius:6px;
+                                        padding:12px; margin-bottom:8px;">
+                                <span style="font-weight:600; color:#79c0ff;">{cwe_id}</span>
+                                <div style="font-size:13px; color:#8b949e; margin-top:4px;">
+                                    {cwe_description}
+                                </div>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        st.markdown("---")
+
+                    # Display narrative
+                    st.markdown("**Attack Narrative**")
+                    narrative_text = attack_info.get("narrative", "No narrative available")
+                    st.markdown(f"""
+                    <div style="background:#161b22; border-left:4px solid #f85149; padding:12px;
+                                border-radius:4px; margin-top:8px;">
+                        <div style="font-size:14px; line-height:1.6; color:#e6edf3;">
+                            {narrative_text}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+with tab7:
+    st.markdown('<div class="section-header">💥 Module Impact Analysis</div>',
+                unsafe_allow_html=True)
+
+    impact_map = st.session_state.get("impact_map", {})
+
+    if not impact_map:
+        st.info("⚠️ Run the pipeline first to analyze module impact.")
+    else:
+        # Get unique packages with impact data
+        impact_packages = []
+        for node_id, impact_data in impact_map.items():
+            package_name = node_id.split(":")[1] if ":" in node_id else node_id
+            impact_packages.append({
+                "node_id": node_id,
+                "package": package_name,
+                "display_name": f"{package_name} ({node_id.split(':')[0].upper()})" if ":" in node_id else package_name,
+                "impact_data": impact_data
+            })
+
+        if not impact_packages:
+            st.info("No module impact data available.")
+        else:
+            # Package selector - show both package name and ecosystem
+            display_names = [p["display_name"] for p in impact_packages]
+            
+            selected_impact_idx = st.selectbox(
+                "Select a vulnerable package to view impact:",
+                options=range(len(impact_packages)),
+                format_func=lambda i: display_names[i]
+            )
+
+            if 0 <= selected_impact_idx < len(impact_packages):
+                p = impact_packages[selected_impact_idx]
+                selected_impact_pkg = p["node_id"]
+                impact_data = p["impact_data"]
+
+                if selected_impact_pkg in impact_map:
+                    # Overview metrics
+                    im1, im2, im3, im4 = st.columns(4)
+                    with im1:
+                        affected_files = len(impact_data.get("affected_files", []))
+                        st.markdown(f"""
+                        <div class="metric-card">
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
+                                AFFECTED FILES
+                            </div>
+                            <div style="font-size:20px; font-weight:700; color:#79c0ff; margin-top:8px;">
+                                {affected_files}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    with im2:
+                        entry_points = len(impact_data.get("entry_points", []))
+                        st.markdown(f"""
+                        <div class="metric-card">
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
+                                ENTRY POINTS
+                            </div>
+                            <div style="font-size:20px; font-weight:700; color:#f85149; margin-top:8px;">
+                                {entry_points}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    with im3:
+                        features = len(impact_data.get("features", []))
+                        st.markdown(f"""
+                        <div class="metric-card">
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
+                                FEATURES AT RISK
+                            </div>
+                            <div style="font-size:20px; font-weight:700; color:#d29922; margin-top:8px;">
+                                {features}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    with im4:
+                        exposure = impact_data.get("exposure_scope", "MEDIUM")
+                        exposure_color = {"HIGH": "#f85149", "MEDIUM": "#d29922", "LOW": "#3fb950"}.get(exposure, "#8b949e")
+                        st.markdown(f"""
+                        <div class="metric-card">
+                            <div style="font-size:12px; color:#8b949e; font-weight:600;">
+                                EXPOSURE SCOPE
+                            </div>
+                            <div style="font-size:18px; font-weight:700; color:{exposure_color}; margin-top:8px;">
+                                {exposure}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    st.markdown("---")
+
+                    # Display affected files
+                    if impact_data.get("affected_files"):
+                        st.markdown("**Affected Source Files**")
+                        file_list = impact_data.get("affected_files", [])
+                        
+                        # Categorize files
+                        for file_path in file_list:
+                            is_entry = "⚡" if file_path in impact_data.get("entry_points", []) else "📄"
+                            st.markdown(f"{is_entry} `{file_path}`")
+
+                    st.markdown("---")
+
+                    # Display entry points
+                    if impact_data.get("entry_points"):
+                        st.markdown("**Entry Points (Direct API surface)**")
+                        for ep in impact_data.get("entry_points", []):
+                            st.markdown(f"""
+                            <div style="background:#16213e; border:1px solid #30363d; border-radius:6px;
+                                        padding:10px; margin-bottom:6px;">
+                                <span style="font-weight:600; color:#79c0ff;">⚡</span>
+                                <code style="margin-left:6px; color:#e6edf3;">{ep}</code>
+                            </div>
+                            """, unsafe_allow_html=True)
+
+                    st.markdown("---")
+
+                    # Display features
+                    if impact_data.get("features"):
+                        st.markdown("**Inferred Features at Risk**")
+                        features_list = impact_data.get("features", [])
+                        
+                        # Create feature badges
+                        feature_cols = st.columns(3)
+                        for idx, feature in enumerate(features_list):
+                            with feature_cols[idx % 3]:
+                                feature_icons = {
+                                    "Authentication": "🔐",
+                                    "Payment": "💳",
+                                    "File Upload": "📤",
+                                    "API Gateway": "🌐",
+                                    "Admin Panel": "⚙️",
+                                    "Email": "📧",
+                                    "Search": "🔍",
+                                    "User Management": "👥",
+                                    "Job Queue": "📋",
+                                    "Reporting": "📊"
+                                }
+                                icon = feature_icons.get(feature, "🏷️")
+                                st.markdown(f"""
+                                <div style="background:#0d1117; border:1px solid #30363d;
+                                            border-radius:6px; padding:12px; text-align:center;
+                                            margin-bottom:8px;">
+                                    <div style="font-size:24px;">{icon}</div>
+                                    <div style="font-size:12px; font-weight:600; color:#e6edf3;
+                                                margin-top:6px;">{feature}</div>
+                                </div>
+                                """, unsafe_allow_html=True)

@@ -1,0 +1,160 @@
+2026-03-29 13:42:12 - __main__ - INFO - main:39 - Starting analysis for: https://github.com/pallets/flask
+2026-03-29 13:43:06 - __main__ - INFO - main:39 - Starting analysis for: https://github.com/pallets/flask
+2026-03-29 13:45:25 - __main__ - INFO - <module>:20 - Configuration validated
+2026-03-29 13:45:27 - __main__ - INFO - main:40 - Testing npm repo: https://github.com/expressjs/express
+2026-03-29 13:45:28 - __main__ - INFO - main:47 - Found 44 npm packages
+2026-03-29 13:45:49 - __main__ - INFO - <module>:20 - Configuration validated
+2026-03-29 13:45:50 - __main__ - INFO - main:40 - Testing Maven repo: https://github.com/apache/commons-lang
+2026-03-29 13:45:51 - __main__ - ERROR - main:44 - No packages found
+2026-03-29 13:47:20 - __main__ - ERROR - main:60 - Fatal error: run_optimization() missing 1 required positional argument: 'simulation_results'
+Traceback (most recent call last):
+  File "C:\Users\kalra\OneDrive\Documents\CascadeGuard\test_npm_repo.py", line 54, in main
+    optimization_result = run_optimization(G)
+                          ^^^^^^^^^^^^^^^^^^^
+TypeError: run_optimization() missing 1 required positional argument: 'simulation_results'
+2026-04-03 10:41:07 - __main__ - INFO - test_agrisense:93 - 
+======================================================================
+2026-04-03 10:41:07 - __main__ - INFO - test_agrisense:94 - TESTING AGRISENSE PROTOTYPE
+2026-04-03 10:41:07 - __main__ - INFO - test_agrisense:95 - URL: https://github.com/Santpal1/AgriSense_Prototype
+2026-04-03 10:41:07 - __main__ - INFO - test_agrisense:96 - ======================================================================
+
+2026-04-03 10:41:07 - __main__ - INFO - test_agrisense:99 - [TEST-1] Stage 1: Ingestion - Extracting dependencies...
+2026-04-03 10:41:09 - __main__ - INFO - test_agrisense:108 - 
+[TEST-2] Stage 2: Building dependency graph...
+2026-04-03 10:43:45 - __main__ - INFO - main:165 - 
+2026-04-03 10:43:45 - __main__ - INFO - main:166 - ######################################################################
+2026-04-03 10:43:45 - __main__ - INFO - main:167 - CASCADEGUARD - FEATURE TEST SUITE
+2026-04-03 10:43:45 - __main__ - INFO - main:168 - Testing: Attack Classification & Module Impact
+2026-04-03 10:43:45 - __main__ - INFO - main:169 - Repository: AgriSense_Prototype
+2026-04-03 10:43:45 - __main__ - INFO - main:170 - ######################################################################
+2026-04-03 10:43:45 - __main__ - INFO - verify_attack_classification_structure:117 - 
+2026-04-03 10:43:45 - __main__ - INFO - verify_attack_classification_structure:118 - ======================================================================
+2026-04-03 10:43:45 - __main__ - INFO - verify_attack_classification_structure:119 - DATA STRUCTURE VERIFICATION: Attack Classification
+2026-04-03 10:43:45 - __main__ - INFO - verify_attack_classification_structure:120 - ======================================================================
+2026-04-03 10:43:45 - __main__ - ERROR - verify_attack_classification_structure:160 - [ERROR] Verification failed: 'list' object has no attribute 'items'
+2026-04-03 10:43:45 - __main__ - INFO - test_attack_classification_feature:19 - 
+2026-04-03 10:43:45 - __main__ - INFO - test_attack_classification_feature:20 - ======================================================================
+2026-04-03 10:43:45 - __main__ - INFO - test_attack_classification_feature:21 - TEST 1: ATTACK CLASSIFICATION FEATURE
+2026-04-03 10:43:45 - __main__ - INFO - test_attack_classification_feature:22 - ======================================================================
+2026-04-03 10:43:45 - __main__ - INFO - test_attack_classification_feature:29 - [TEST-AC] Loaded enriched graph with 503 nodes
+2026-04-03 10:43:45 - __main__ - ERROR - test_attack_classification_feature:66 - [ERROR] Test failed: 'list' object has no attribute 'items'
+2026-04-03 10:43:45 - __main__ - INFO - test_module_impact_feature:74 - 
+2026-04-03 10:43:45 - __main__ - INFO - test_module_impact_feature:75 - ======================================================================
+2026-04-03 10:43:45 - __main__ - INFO - test_module_impact_feature:76 - TEST 2: MODULE IMPACT MAPPING FEATURE
+2026-04-03 10:43:45 - __main__ - INFO - test_module_impact_feature:77 - ======================================================================
+2026-04-03 10:43:45 - __main__ - INFO - test_module_impact_feature:104 - [INFO] impact_report.json not yet generated
+2026-04-03 10:43:45 - __main__ - INFO - test_module_impact_feature:105 - [INFO] This is normal - created during full pipeline run
+2026-04-03 10:43:45 - __main__ - INFO - main:184 - 
+2026-04-03 10:43:45 - __main__ - INFO - main:185 - ======================================================================
+2026-04-03 10:43:45 - __main__ - INFO - main:186 - TEST SUMMARY
+2026-04-03 10:43:45 - __main__ - INFO - main:187 - ======================================================================
+2026-04-03 10:43:45 - __main__ - INFO - main:194 - [FAIL] structure
+2026-04-03 10:43:45 - __main__ - INFO - main:194 - [FAIL] attack_class
+2026-04-03 10:43:45 - __main__ - INFO - main:194 - [SKIP] module_impact
+2026-04-03 10:43:45 - __main__ - INFO - main:196 - 
+2026-04-03 10:43:45 - __main__ - INFO - main:197 - Results: 0/2 tests passed
+2026-04-03 10:43:45 - __main__ - INFO - main:204 - 
+2026-04-03 10:43:45 - __main__ - INFO - main:205 - CONCLUSION: Some features need review or more data
+2026-04-03 10:44:17 - __main__ - INFO - main:167 - 
+2026-04-03 10:44:17 - __main__ - INFO - main:168 - ######################################################################
+2026-04-03 10:44:17 - __main__ - INFO - main:169 - CASCADEGUARD - FEATURE TEST SUITE
+2026-04-03 10:44:17 - __main__ - INFO - main:170 - Testing: Attack Classification & Module Impact
+2026-04-03 10:44:17 - __main__ - INFO - main:171 - Repository: AgriSense_Prototype
+2026-04-03 10:44:17 - __main__ - INFO - main:172 - ######################################################################
+2026-04-03 10:44:17 - __main__ - INFO - verify_attack_classification_structure:118 - 
+2026-04-03 10:44:17 - __main__ - INFO - verify_attack_classification_structure:119 - ======================================================================
+2026-04-03 10:44:17 - __main__ - INFO - verify_attack_classification_structure:120 - DATA STRUCTURE VERIFICATION: Attack Classification
+2026-04-03 10:44:17 - __main__ - INFO - verify_attack_classification_structure:121 - ======================================================================
+2026-04-03 10:44:17 - __main__ - INFO - verify_attack_classification_structure:137 - Sample Node: npm:autoprefixer
+2026-04-03 10:44:17 - __main__ - INFO - verify_attack_classification_structure:138 - 
+2026-04-03 10:44:17 - __main__ - INFO - verify_attack_classification_structure:139 - Attack Classification Fields:
+2026-04-03 10:44:17 - __main__ - INFO - verify_attack_classification_structure:140 -   primary_attack_type: None
+2026-04-03 10:44:17 - __main__ - INFO - verify_attack_classification_structure:141 -   attacker_capability: Unknown
+2026-04-03 10:44:17 - __main__ - INFO - verify_attack_classification_structure:142 -   cwe_ids: []
+2026-04-03 10:44:18 - __main__ - INFO - verify_attack_classification_structure:143 -   cwe_descriptions keys: []
+2026-04-03 10:44:18 - __main__ - INFO - verify_attack_classification_structure:144 -   narrative (first 100 chars): ...
+2026-04-03 10:44:18 - __main__ - INFO - verify_attack_classification_structure:155 - [FAIL] Missing fields: ['primary_attack_type', 'narrative']
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:19 - 
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:20 - ======================================================================
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:21 - TEST 1: ATTACK CLASSIFICATION FEATURE
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:22 - ======================================================================
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:29 - [TEST-AC] Loaded enriched graph with 503 nodes
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:45 - [PASS] pypi:scikit-learn
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:46 -        Attack Type: None
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:47 -        Capability: Unknown
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:48 -        CWEs: 0
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:49 -        Has Narrative: No
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:53 - 
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:54 - ATTACK CLASSIFICATION RESULT:
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:55 -   Total nodes with vulnerabilities checked: 1
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:56 -   Nodes with attack classification: 1
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:57 -   Success rate: 100.0%
+2026-04-03 10:44:18 - __main__ - INFO - test_attack_classification_feature:60 - [PASS] Attack Classification Feature is WORKING!
+2026-04-03 10:44:18 - __main__ - INFO - test_module_impact_feature:75 - 
+2026-04-03 10:44:18 - __main__ - INFO - test_module_impact_feature:76 - ======================================================================
+2026-04-03 10:44:18 - __main__ - INFO - test_module_impact_feature:77 - TEST 2: MODULE IMPACT MAPPING FEATURE
+2026-04-03 10:44:18 - __main__ - INFO - test_module_impact_feature:78 - ======================================================================
+2026-04-03 10:44:18 - __main__ - INFO - test_module_impact_feature:105 - [INFO] impact_report.json not yet generated
+2026-04-03 10:44:18 - __main__ - INFO - test_module_impact_feature:106 - [INFO] This is normal - created during full pipeline run
+2026-04-03 10:44:18 - __main__ - INFO - main:186 - 
+2026-04-03 10:44:18 - __main__ - INFO - main:187 - ======================================================================
+2026-04-03 10:44:18 - __main__ - INFO - main:188 - TEST SUMMARY
+2026-04-03 10:44:18 - __main__ - INFO - main:189 - ======================================================================
+2026-04-03 10:44:18 - __main__ - INFO - main:196 - [FAIL] structure
+2026-04-03 10:44:18 - __main__ - INFO - main:196 - [PASS] attack_class
+2026-04-03 10:44:18 - __main__ - INFO - main:196 - [SKIP] module_impact
+2026-04-03 10:44:18 - __main__ - INFO - main:198 - 
+2026-04-03 10:44:18 - __main__ - INFO - main:199 - Results: 1/2 tests passed
+2026-04-03 10:44:18 - __main__ - INFO - main:206 - 
+2026-04-03 10:44:18 - __main__ - INFO - main:207 - CONCLUSION: Some features need review or more data
+2026-04-03 10:51:33 - __main__ - INFO - main:207 - 
+2026-04-03 10:51:33 - __main__ - INFO - main:208 - ##############################################################
+2026-04-03 10:51:33 - __main__ - INFO - main:209 - CASCADEGUARD - FIX VERIFICATION TEST SUITE
+2026-04-03 10:51:33 - __main__ - INFO - main:210 - ##############################################################
+2026-04-03 10:51:33 - __main__ - INFO - test_attack_classifier_with_references:14 - 
+2026-04-03 10:51:33 - __main__ - INFO - test_attack_classifier_with_references:15 - ======================================================================
+2026-04-03 10:51:33 - __main__ - INFO - test_attack_classifier_with_references:16 - TEST: extract_cwe_ids() with references
+2026-04-03 10:51:33 - __main__ - INFO - test_attack_classifier_with_references:17 - ======================================================================
+2026-04-03 10:51:33 - __main__ - INFO - test_attack_classifier_with_references:58 - Extracted CWE IDs: ['CWE-89', 'CWE-78']
+2026-04-03 10:51:33 - __main__ - INFO - test_attack_classifier_with_references:61 - [PASS] CWE extraction working!
+2026-04-03 10:51:33 - __main__ - INFO - test_attack_classifier_with_references:68 - Attack classification: {'attack_types': ['Command Injection', 'SQL Injection'], 'primary_attack': 'Data Manipulation / Theft', 'attacker_capability': 'Execute arbitrary system commands + Read/modify/delete database records', 'cwe_ids': ['CWE-89', 'CWE-78']}
+2026-04-03 10:51:33 - __main__ - INFO - test_attack_classifier_with_references:71 - [PASS] Primary attack: Data Manipulation / Theft
+2026-04-03 10:51:33 - __main__ - INFO - test_attack_classifier_with_references:77 - Generated narrative: test-package@1.0.0 allows data theft and manipulation via command injection, sql injection. Sensitive data in databases or files may be exposed, modified, or deleted (CWE-89, CWE-78)
+2026-04-03 10:51:33 - __main__ - INFO - test_attack_classifier_with_references:80 - [PASS] Narrative generated!
+2026-04-03 10:51:33 - __main__ - INFO - test_ast_scanner:90 - 
+2026-04-03 10:51:33 - __main__ - INFO - test_ast_scanner:91 - ======================================================================
+2026-04-03 10:51:33 - __main__ - INFO - test_ast_scanner:92 - TEST: AST Scanner
+2026-04-03 10:51:33 - __main__ - INFO - test_ast_scanner:93 - ======================================================================
+2026-04-03 10:51:33 - __main__ - INFO - test_ast_scanner:126 - Scanned 3 files
+2026-04-03 10:51:33 - __main__ - INFO - test_ast_scanner:129 -   app.py: imports=['flask', 'json', 'requests'], functions=1
+2026-04-03 10:51:33 - __main__ - INFO - test_ast_scanner:129 -   payments.py: imports=['decimal', 'stripe'], functions=1
+2026-04-03 10:51:33 - __main__ - INFO - test_ast_scanner:129 -   index.js: imports=['app()', 'axios', 'express'], functions=0
+2026-04-03 10:51:33 - __main__ - INFO - test_ast_scanner:133 - [PASS] AST scanner working!
+2026-04-03 10:51:33 - __main__ - INFO - test_impact_mapper:142 - 
+2026-04-03 10:51:33 - __main__ - INFO - test_impact_mapper:143 - ======================================================================
+2026-04-03 10:51:33 - __main__ - INFO - test_impact_mapper:144 - TEST: Impact Mapper
+2026-04-03 10:51:33 - __main__ - INFO - test_impact_mapper:145 - ======================================================================
+2026-04-03 10:51:35 - __main__ - INFO - test_impact_mapper:190 - Generated impact map for 1 packages
+2026-04-03 10:51:35 - __main__ - INFO - test_impact_mapper:193 -   npm:express@4.17.1:
+2026-04-03 10:51:35 - __main__ - INFO - test_impact_mapper:194 -     Affected files: 0
+2026-04-03 10:51:35 - __main__ - INFO - test_impact_mapper:195 -     Entry points: 0
+2026-04-03 10:51:35 - __main__ - INFO - test_impact_mapper:196 -     Features: []
+2026-04-03 10:51:35 - __main__ - INFO - test_impact_mapper:199 - [PASS] Impact mapper working!
+2026-04-03 10:51:35 - __main__ - INFO - main:242 - 
+2026-04-03 10:51:35 - __main__ - INFO - main:243 - ======================================================================
+2026-04-03 10:51:35 - __main__ - INFO - main:244 - FIX VERIFICATION SUMMARY
+2026-04-03 10:51:35 - __main__ - INFO - main:245 - ======================================================================
+2026-04-03 10:51:35 - __main__ - INFO - main:252 - [PASS] attack_classifier
+2026-04-03 10:51:35 - __main__ - INFO - main:252 - [PASS] ast_scanner
+2026-04-03 10:51:35 - __main__ - INFO - main:252 - [PASS] impact_mapper
+2026-04-03 10:51:35 - __main__ - INFO - main:254 - 
+2026-04-03 10:51:35 - __main__ - INFO - main:255 - Results: 3/3 tests passed
+2026-04-03 10:51:35 - __main__ - INFO - main:258 - 
+2026-04-03 10:51:35 - __main__ - INFO - main:259 - SUCCESS! All fixes are working correctly!
+2026-04-03 10:51:35 - __main__ - INFO - main:260 - 
+2026-04-03 10:51:35 - __main__ - INFO - main:261 - Next steps:
+2026-04-03 10:51:35 - __main__ - INFO - main:262 - 1. The enricher will now properly extract CWE data from OSV
+2026-04-03 10:51:35 - __main__ - INFO - main:263 - 2. Attack narratives will be generated for all vulnerable packages
+2026-04-03 10:51:35 - __main__ - INFO - main:264 - 3. The full pipeline can now generate module impact reports
+2026-04-03 10:51:35 - __main__ - INFO - main:265 - 
+2026-05-09 13:35:09 - __main__ - INFO - main:120 - Starting analysis for: https://github.com/pallets/flask

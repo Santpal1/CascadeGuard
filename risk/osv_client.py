@@ -79,6 +79,9 @@ def _parse_vulnerability(vuln: dict) -> dict:
     vuln_id  = vuln.get("id", "UNKNOWN")
     summary  = vuln.get("summary", "No summary available")
     aliases  = vuln.get("aliases", [])  # often contains the CVE ID
+    
+    # IMPORTANT: Preserve references for CWE extraction
+    references = vuln.get("references", [])
 
     # Prefer CVE alias over GHSA id for recognizability
     display_id = next(
@@ -95,14 +98,17 @@ def _parse_vulnerability(vuln: dict) -> dict:
     detail_url = f"https://osv.dev/vulnerability/{vuln_id}"
 
     return {
-        "vuln_id":    vuln_id,
-        "display_id": display_id,
-        "summary":    summary,
-        "severity":   severity,
-        "cvss_score": cvss_score,
-        "fixed_in":   fixed_in,
-        "detail_url": detail_url,
-    }
+    "vuln_id":           vuln_id,
+    "display_id":        display_id,
+    "summary":           summary,
+    "severity":          severity,
+    "cvss_score":        cvss_score,
+    "fixed_in":          fixed_in,
+    "detail_url":        detail_url,
+    "references":        references,
+    "database_specific": vuln.get("database_specific", {}),  # needed for CWE extraction
+    "aliases":           aliases,                             # needed for CWE extraction
+}
 
 
 def _extract_severity(vuln: dict) -> tuple:

@@ -5,6 +5,7 @@ import os
 
 from risk.osv_client import query_vulnerabilities
 from risk.scorer import compute_risk_score, classify_risk
+from risk.attack_classifier import classify_attack, extract_cwe_ids, get_attack_narrative, CWE_ATTACK_MAP
 
 def _aggregate_cvss(vulns: list) -> float:
     """
@@ -136,14 +137,37 @@ def enrich_graph(G: nx.DiGraph, simulation_results: dict = None) -> nx.DiGraph:
         )
         risk_class = classify_risk(risk_score)
 
+        # Extract CWE IDs and classify attack types
+        cwe_ids = extract_cwe_ids(vulns)
+        attack_classification = classify_attack(cwe_ids)
+        
+        # Determine severity
+        severity = vulns[0]["severity"] if vulns else "UNKNOWN"
+        
+        # Always generate attack narrative, even if no CWEs found
+        narrative = get_attack_narrative(node, attack_classification, severity=severity)
+        attack_classification["narrative"] = narrative
+        attack_classification["severity"] = severity
+        
+        # Add CWE descriptions for dashboard compatibility
+        cwe_descriptions = {}
+        for cwe_id in attack_classification.get("cwe_ids", []):
+            if cwe_id in CWE_ATTACK_MAP:
+                cwe_descriptions[cwe_id] = CWE_ATTACK_MAP[cwe_id].get("category", "Unknown")
+        attack_classification["cwe_descriptions"] = cwe_descriptions
+        
+        # Standardize field name for dashboard (primary_attack_type instead of primary_attack)
+        attack_classification["primary_attack_type"] = attack_classification.get("primary_attack", "Unknown")
+
         # Store everything back on the node
         G.nodes[node]["vulnerabilities"] = vulns
         G.nodes[node]["vuln_count"]      = len(vulns)
         G.nodes[node]["cvss_score"]      = cvss_score
-        G.nodes[node]["severity"]        = vulns[0]["severity"] if vulns else "CLEAN"
+        G.nodes[node]["severity"]        = severity
         G.nodes[node]["risk_score"]      = risk_score
         G.nodes[node]["risk_class"]      = risk_class
         G.nodes[node]["fix_available"]   = fix_available
+        G.nodes[node]["attack_classification"] = attack_classification
 
         if vulns:
             vulnerable_nodes += 1
@@ -153,12 +177,12 @@ def enrich_graph(G: nx.DiGraph, simulation_results: dict = None) -> nx.DiGraph:
     sim = simulation_results.get(node, {}) if simulation_results else {}
     G.nodes[node]["explanation"] = _build_explanation(node, G.nodes[node], sim)
 
-    print(f"\n[enricher] ── Enrichment Summary ─────────────────────")
+    print(f"\n[enricher] -- Enrichment Summary ---------------------")
     print(f"[enricher] Nodes scanned:      {len(nodes)}")
     print(f"[enricher] Vulnerable nodes:   {vulnerable_nodes}")
     print(f"[enricher] Total vulns found:  {total_vulns}")
     print(f"[enricher] Critical nodes:     {critical_nodes}")
-    print(f"[enricher] ────────────────────────────────────────────\n")
+    print(f"[enricher] -----------------------------------------------\n")
 
     return G
 
@@ -244,3 +268,57 @@ def print_risk_report(G: nx.DiGraph):
         print("  No vulnerabilities found.")
 
     print(f"  {'─'*72}\n")
+
+
+def print_enhanced_risk_report(G: nx.DiGraph, impact_map: dict = None):
+    """
+    Prints an enhanced risk report with attack types, affected files, and narratives.
+    Called after impact mapping is available.
+    
+    Args:
+        G: Enriched graph with vulnerability data
+        impact_map: Result from impact_mapper.map_impact()
+    """
+    from risk.narrative_generator import generate_full_narrative
+    
+    vulnerable = [
+        (node, data) for node, data in G.nodes(data=True)
+        if data.get("risk_score", 0) > 0 and data.get("risk_class") in ["CRITICAL", "HIGH"]
+    ]
+    vulnerable.sort(key=lambda x: x[1]["risk_score"], reverse=True)
+
+    if not vulnerable:
+        print("\n[enricher] No CRITICAL or HIGH vulnerabilities found.\n")
+        return
+
+    print("\n[enricher] ── Enhanced Risk Report (CRITICAL & HIGH) ──────")
+    print()
+
+    for node, data in vulnerable:
+        version = data.get("version", "unknown")
+        package_id = f"{node}@{version}"
+        
+        # Generate full narrative
+        risk_score = data.get("risk_score", 0)
+        risk_class = data.get("risk_class", "UNKNOWN")
+        
+        narrative_data = generate_full_narrative(
+            node, data, impact_map or {}, risk_score, risk_class
+        )
+        
+        print(f"  Package: {narrative_data['package']}")
+        print(f"  Risk: {narrative_data['risk_score']} ({narrative_data['risk_class']})")
+        print(f"  Attack Type: {narrative_data['attack_type']}")
+        print(f"  Attacker Capability: {narrative_data['attacker_capability']}")
+        
+        if narrative_data["affected_files"]:
+            print(f"  Affected Files: {', '.join(narrative_data['affected_files'][:3])}")
+        
+        if narrative_data["affected_features"]:
+            print(f"  Features: {', '.join(narrative_data['affected_features'])}")
+        
+        print(f"  Exposure: {narrative_data['exposure_scope']}")
+        print(f"  Fix: {narrative_data['fix_recommendation']}")
+        print(f"  Narrative: {narrative_data['narrative']}")
+        print(f"  {'─'*70}")
+        print()
