@@ -21,9 +21,9 @@ http://localhost:8501
 Make sure your `.env` file has:
 
 ```
-GITHUB_TOKEN=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
-CLIENT_ID=Ov23lit1oMOSKbKnId5J
-CLIENT_SECRET=4f9d3a6cadddb7806349e369745820ebb7c809c6
+GITHUB_TOKEN=...
+CLIENT_ID=...
+CLIENT_SECRET=...
 OAUTH_REDIRECT_URI=http://localhost:8501
 ```
 
